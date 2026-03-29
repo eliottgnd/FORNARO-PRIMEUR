@@ -1,0 +1,76 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --color-vert:         #1e3a28;
+  --color-vert-mid:     #2e5438;
+  --color-vert-light:   #4a7c59;
+  --color-matcha:       #7a9e7e;
+  --color-matcha-light: #a8c5a0;
+  --color-creme:        #f5f0e8;
+  --color-creme-dark:   #ede6d6;
+  --color-texte:        #1a1a16;
+  --color-gris:         #6b6b5e;
+  --color-blanc:        #fdfaf4;
+
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body:    'DM Sans', system-ui, sans-serif;
+
+  --animate-fade-up:   fadeUp 0.6s ease both;
+  --animate-pulse-dot: pulseDot 2s infinite;
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulseDot {
+    0%, 100% { opacity: 1;   transform: scale(1); }
+    50%      { opacity: 0.5; transform: scale(1.4); }
+  }
+}
+
+html {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+body {
+  background-color: var(--color-blanc);
+  color: var(--color-texte);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  width: 100%;
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-matcha text-white font-semibold rounded-full px-7 py-3 text-sm
+           transition-all hover:-translate-y-0.5 hover:shadow-lg
+           hover:shadow-matcha/30 active:translate-y-0 cursor-pointer;
+  }
+  .btn-outline-light {
+    @apply border border-white/40 text-white rounded-full px-7 py-3 text-sm
+           transition-all hover:bg-white/10 cursor-pointer;
+  }
+  .btn-outline-dark {
+    @apply border border-creme-dark text-vert rounded-full px-7 py-3 text-sm
+           transition-all hover:bg-creme-dark cursor-pointer;
+  }
+  .card {
+    @apply bg-white rounded-3xl border border-creme-dark overflow-hidden
+           transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-vert/10;
+  }
+  .section-eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-[0.14em] text-matcha;
+  }
+  .section-title {
+    @apply font-display text-4xl text-vert leading-tight;
+  }
+  .input-field {
+    @apply w-full border border-creme-dark rounded-2xl px-4 py-3 text-sm
+           bg-white text-texte placeholder:text-gris/60
+           focus:outline-none focus:ring-2 focus:ring-matcha/30
+           focus:border-matcha transition-all;
+  }
+}
