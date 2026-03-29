@@ -28,7 +28,7 @@ export default function Produits() {
   }
 
   return (
-    <div className=" min-h-screen bg-blanc">
+    <div className="min-h-screen bg-blanc">
 
       {/* ── HEADER ───────────────────────────────────────────── */}
       <div className="bg-vert px-6 md:px-20 py-12 md:py-16 relative overflow-hidden">
@@ -231,97 +231,92 @@ export default function Produits() {
       )}
 
       {/* ── DRAWER FILTRES MOBILE ────────────────────────────── */}
-      <div
-        className={`fixed left-0 right-0 bottom-0 z-[90] md:hidden bg-blanc rounded-t-3xl shadow-2xl transition-transform duration-300 ease-out ${
-          drawerOuvert ? 'translate-y-0' : 'translate-y-[110%]'
-        }`}
-        style={{ maxHeight: '85vh', overflowY: 'auto' }}
-      >
-        {/* Handle */}
-        <div className="flex justify-center pt-3 pb-1 sticky top-0 bg-blanc z-10">
-          <div className="w-10 h-1 rounded-full bg-creme-dark" />
-        </div>
-
-        <div className="px-6 pb-10 pt-4">
-
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="font-display text-xl text-vert">Filtres</h3>
-            <button
-              onClick={() => setDrawerOuvert(false)}
-              className="w-8 h-8 rounded-full border border-creme-dark grid place-items-center text-gris"
-            >
-              <X size={14} />
-            </button>
+      {drawerOuvert && (
+        <div
+          className="fixed left-0 right-0 bottom-0 z-[90] md:hidden bg-blanc rounded-t-3xl shadow-2xl"
+          style={{ maxHeight: '85vh', overflowY: 'auto' }}
+        >
+          <div className="flex justify-center pt-3 pb-1 sticky top-0 bg-blanc z-10">
+            <div className="w-10 h-1 rounded-full bg-creme-dark" />
           </div>
 
-          {/* Categories */}
-          <div className="mb-6">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-gris mb-3">
-              Categorie
-            </p>
-            <div className="grid grid-cols-2 gap-2">
-              {[{ id: 'tous', label: 'Tous', emoji: '✨' }, ...categories].map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => setCategorieActive(cat.id)}
-                  className={`flex items-center gap-2 px-4 py-3 rounded-2xl text-[13px] font-medium border transition-all ${
-                    categorieActive === cat.id
-                      ? 'bg-vert text-white border-vert'
-                      : 'bg-white text-gris border-creme-dark'
-                  }`}
-                >
-                  <span>{'emoji' in cat ? cat.emoji : ''}</span>
-                  <span>{cat.label}</span>
-                  {categorieActive === cat.id && <Check size={14} className="ml-auto" />}
-                </button>
-              ))}
+          <div className="px-6 pb-10 pt-4">
+
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="font-display text-xl text-vert">Filtres</h3>
+              <button
+                onClick={() => setDrawerOuvert(false)}
+                className="w-8 h-8 rounded-full border border-creme-dark grid place-items-center text-gris"
+              >
+                <X size={14} />
+              </button>
             </div>
-          </div>
 
-          {/* Sous-tags */}
-          <div className="mb-8">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-gris mb-3">
-              Type
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {['Tous', ...sousTags].map((tag) => {
-                const val = tag === 'Tous' ? 'tous' : tag
-                return (
+            <div className="mb-6">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-gris mb-3">
+                Categorie
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {[{ id: 'tous', label: 'Tous', emoji: '✨' }, ...categories].map((cat) => (
                   <button
-                    key={tag}
-                    onClick={() => setSousTagActif(val)}
-                    className={`px-4 py-2 rounded-full text-[12px] border transition-all ${
-                      sousTagActif === val
-                        ? 'bg-matcha text-white border-matcha font-semibold'
-                        : 'bg-creme text-gris border-transparent'
+                    key={cat.id}
+                    onClick={() => setCategorieActive(cat.id)}
+                    className={`flex items-center gap-2 px-4 py-3 rounded-2xl text-[13px] font-medium border transition-all ${
+                      categorieActive === cat.id
+                        ? 'bg-vert text-white border-vert'
+                        : 'bg-white text-gris border-creme-dark'
                     }`}
                   >
-                    {tag}
+                    <span>{'emoji' in cat ? cat.emoji : ''}</span>
+                    <span>{cat.label}</span>
+                    {categorieActive === cat.id && <Check size={14} className="ml-auto" />}
                   </button>
-                )
-              })}
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* Actions */}
-          <div className="flex gap-3">
-            <button
-              onClick={resetFiltres}
-              className="flex-1 py-3 rounded-2xl border border-creme-dark text-[13px] font-medium text-gris"
-            >
-              Reinitialiser
-            </button>
-            <button
-              onClick={() => setDrawerOuvert(false)}
-              className="flex-1 py-3 rounded-2xl bg-vert text-white text-[13px] font-medium"
-            >
-              Voir {produitsFiltres.length} produit{produitsFiltres.length > 1 ? 's' : ''}
-            </button>
-          </div>
+            <div className="mb-8">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-gris mb-3">
+                Type
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {['Tous', ...sousTags].map((tag) => {
+                  const val = tag === 'Tous' ? 'tous' : tag
+                  return (
+                    <button
+                      key={tag}
+                      onClick={() => setSousTagActif(val)}
+                      className={`px-4 py-2 rounded-full text-[12px] border transition-all ${
+                        sousTagActif === val
+                          ? 'bg-matcha text-white border-matcha font-semibold'
+                          : 'bg-creme text-gris border-transparent'
+                      }`}
+                    >
+                      {tag}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
 
+            <div className="flex gap-3">
+              <button
+                onClick={resetFiltres}
+                className="flex-1 py-3 rounded-2xl border border-creme-dark text-[13px] font-medium text-gris"
+              >
+                Reinitialiser
+              </button>
+              <button
+                onClick={() => setDrawerOuvert(false)}
+                className="flex-1 py-3 rounded-2xl bg-vert text-white text-[13px] font-medium"
+              >
+                Voir {produitsFiltres.length} produit{produitsFiltres.length > 1 ? 's' : ''}
+              </button>
+            </div>
+
+          </div>
         </div>
-      </div>
+      )}
 
     </div>
   )
