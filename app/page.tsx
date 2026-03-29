@@ -63,7 +63,7 @@ export default function Home() {
           </div>
 
           <h1 ref={heroTitleRef} className="font-display text-4xl md:text-6xl text-creme leading-[1.1] mb-4 md:mb-6 opacity-0">
-            Le meilleur du<br />marche, livre<br />
+            Le meilleur du<br />marche, livré<br />
             <em className="text-matcha-light">chez vous.</em>
           </h1>
 
@@ -103,7 +103,7 @@ export default function Home() {
           <div className="bg-creme-dark px-6 md:px-8 py-4 md:py-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
             <div className="flex items-center gap-2 text-[12px] md:text-[13px] text-gris">
               <span className="w-2 h-2 rounded-full bg-matcha shrink-0" />
-              Livraison sur Biarritz et Hendaye
+              <span>Fruits et legumes frais du jour</span>
             </div>
             <span className="text-[12px] md:text-[13px] text-gris">Commandez avant 20h</span>
           </div>
