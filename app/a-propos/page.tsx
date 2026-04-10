@@ -15,7 +15,7 @@ const equipe = [
 
 const valeurs = [
   { icon: '🌱', titre: 'Fraîcheur',  desc: 'Chaque produit est sélectionné avec rigueur chez nos producteurs.' },
-  { icon: '🤝', titre: 'Confiance',  desc: 'Nous travaillons depuis de nombreuses années aved des producteurs passionnés.' },
+  { icon: '🤝', titre: 'Confiance',  desc: 'Nous travaillons depuis de nombreuses années avec des producteurs passionnés.' },
   { icon: '🌍', titre: 'Engagement', desc: 'Produits de saison, circuits courts et emballages réduits au maximum.' },
   { icon: '❤️', titre: 'Passion',    desc: 'Le goût et la qualité sont au cœur de chaque décision que nous prenons.' },
 ]
