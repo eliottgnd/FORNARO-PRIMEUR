@@ -14,8 +14,8 @@ const equipe = [
 ]
 
 const valeurs = [
-  { icon: '🌱', titre: 'Fraîcheur',  desc: 'Chaque produit est sélectionné le matin même sur les marchés du Pays Basque.' },
-  { icon: '🤝', titre: 'Confiance',  desc: 'Nous travaillons avec des producteurs locaux que nous connaissons personnellement.' },
+  { icon: '🌱', titre: 'Fraîcheur',  desc: 'Chaque produit est sélectionné avec rigueur chez nos producteurs.' },
+  { icon: '🤝', titre: 'Confiance',  desc: 'Nous travaillons depuis de nombreuses années aved des producteurs passionnés.' },
   { icon: '🌍', titre: 'Engagement', desc: 'Produits de saison, circuits courts et emballages réduits au maximum.' },
   { icon: '❤️', titre: 'Passion',    desc: 'Le goût et la qualité sont au cœur de chaque décision que nous prenons.' },
 ]
@@ -116,16 +116,15 @@ export default function APropos() {
             <p className="section-eyebrow mb-4">Depuis toujours</p>
             <h2 className="section-title mb-6">Une passion transmise de génération en génération</h2>
             <p className="text-[13px] md:text-[14px] text-gris leading-relaxed mb-4">
-              Tout a commencé avec Jean-François Fornaro, arrivé sur les marchés il y a plus de vingt ans
-              avec une seule conviction : que bien manger commence par bien choisir ses produits.
+              Tout à commencé dans les années 80 avec Marcel FORNARO, fondateur, qui s'est implaté
+              sur différents marchés dont les Halles de Biarritz et le marché d'Hendaye, créant une entreprises familiale, rejoint par sa femme et ses enfants.
             </p>
             <p className="text-[13px] md:text-[14px] text-gris leading-relaxed mb-4">
-              Chaque matin, avant l'aube, notre équipe parcourt les halles de Biarritz et d'Hendaye
-              pour sélectionner à la main les meilleurs fruits et légumes du jour.
+              Repris il y a une quinzaine d'années par le benjamin de la famille Jean-François.
             </p>
             <p className="text-[13px] md:text-[14px] text-gris leading-relaxed">
-              Aujourd'hui, Fornaro c'est une famille soudée, des producteurs de confiance,
-              et des centaines de clients fidèles qui nous font confiance chaque semaine.
+              Aujourd'hui, il a su conserver ces valeurs en continuant de se développer et à travailler avec des
+              producteurs de confiance. Sans compter sur les centaines de clients fidèles, sans qui, rien ne serait possible.
             </p>
           </AnimateIn>
           <AnimateIn direction="right">

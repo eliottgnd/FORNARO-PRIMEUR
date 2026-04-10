@@ -63,7 +63,7 @@ export const categories = [
   { id: 'fruits',   label: 'Fruits',          emoji: '🍎', description: 'Retrouvez une sélection de fruits de saison',    bg: 'from-yellow-50 to-yellow-100' },
   { id: 'legumes',  label: 'Légumes',         emoji: '🥦', description: 'Retrouvez une sélection de légumes frais',       bg: 'from-green-50 to-green-100'   },
   { id: 'epicerie', label: 'Épicerie',        emoji: '🫙', description: "Retrouvez la sélection de l'épicerie",           bg: 'from-orange-50 to-orange-100' },
-  { id: 'local',    label: 'Produits locaux', emoji: '🌿', description: 'Retrouvez nos produits locaux du Pays Basque',   bg: 'from-purple-50 to-purple-100' },
+  { id: 'local',    label: 'Direct producteur', emoji: '🌿', description: 'Retrouvez une sélection de produits de qualité en circuit court',   bg: 'from-purple-50 to-purple-100' },
 ]
 
 export const sousTags = ['Saison', 'À jus & Smoothie', 'À croquer', 'Pour pâtisserie', 'Pour salade', 'Autres']
@@ -71,8 +71,8 @@ export const sousTags = ['Saison', 'À jus & Smoothie', 'À croquer', 'Pour pât
 // ─── MARCHÉS ──────────────────────────────────────────────────────────────────
 
 export const marches: Marche[] = [
-  { id: 'm1', nom: 'Marché de Biarritz', adresse: 'Halles centrales, Rue des Halles', ville: '64200 Biarritz', emoji: '🏛️' },
-  { id: 'm2', nom: "Halles d'Hendaye",   adresse: '1 Rue de la Halle',               ville: '64700 Hendaye',  emoji: '🏪' },
+  { id: 'm1', nom: 'Marché de Biarritz', adresse: '(Entre les 2 Halles) — Rue des Halles', ville: '64200 Biarritz', emoji: '🏛️' },
+  { id: 'm2', nom: "Marché d'Hendaye",   adresse: '(Hendaye plage) — Marché de Sokoburu', ville: '64700 Hendaye',  emoji: '🏪' },
 ]
 
 // ─── COMMANDES ────────────────────────────────────────────────────────────────

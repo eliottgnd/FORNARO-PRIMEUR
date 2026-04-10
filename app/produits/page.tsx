@@ -37,7 +37,7 @@ export default function Produits() {
           <p className="section-eyebrow text-matcha-light mb-3">Catalogue</p>
           <h1 className="font-display text-4xl md:text-5xl text-creme mb-4">Nos produits</h1>
           <p className="text-creme/50 text-[14px] md:text-[15px] max-w-md">
-            Selectionnes chaque matin sur les marches du Pays Basque, livres frais chez vous.
+            Sélectionnés pour vous chaque matin sur notre stand et livrés chez vous.
           </p>
         </AnimateIn>
       </div>

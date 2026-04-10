@@ -170,8 +170,8 @@ export default function Contact() {
           <div className="space-y-3 md:space-y-4 mb-8 md:mb-12">
             {[
               { icon: Mail,  label: 'Email',     valeur: 'contact@fornaro-primeur.fr' },
-              { icon: Phone, label: 'Téléphone', valeur: '+33 05 00 00 00 00'         },
-              { icon: Clock, label: 'Horaires',  valeur: 'Lun–Sam : 7h00 – 20h00'    },
+              { icon: Phone, label: 'Téléphone', valeur: '+33 06 35 12 33 74'         },
+              { icon: Clock, label: 'Horaires',  valeur: 'Mar-Ven : 7h00 – 20h00'    },
             ].map((info) => (
               <div key={info.label} className="flex items-center gap-3 md:gap-4 bg-white rounded-2xl p-4 md:p-5 border border-creme-dark">
                 <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-creme flex items-center justify-center text-matcha shrink-0">

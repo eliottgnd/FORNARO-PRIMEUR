@@ -24,10 +24,10 @@ export function Footer() {
         {/* Brand */}
         <div className="col-span-2 md:col-span-1">
           <div className="font-display text-xl tracking-widest text-creme uppercase mb-4">
-            For<span className="italic text-matcha-light">naro</span>
+            For<span className="italic text-matcha-light">naro</span> PRIMEUR
           </div>
           <p className="text-sm text-creme/50 leading-relaxed max-w-[200px]">
-            Primeur artisanal livrant fruits et légumes frais chaque matin au Pays Basque.
+            Entreprise familiale au Pays Basque et à votre écoute depuis plus de 40ans.
           </p>
         </div>
 

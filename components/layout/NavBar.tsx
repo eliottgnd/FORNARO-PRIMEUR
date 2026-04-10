@@ -43,7 +43,7 @@ export function Navbar() {
       >
         {/* Logo */}
         <Link href="/" className="font-display text-xl tracking-widest text-vert uppercase">
-          For<span className="italic text-matcha">naro</span>
+          For<span className="italic text-matcha">naro</span> PRIMEUR
         </Link>
 
         {/* Liens desktop */}

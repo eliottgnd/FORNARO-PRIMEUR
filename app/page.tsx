@@ -58,7 +58,7 @@ export default function Home() {
           <div ref={heroTagRef} className="flex items-center gap-2 bg-matcha/20 border border-matcha/30 rounded-full px-4 py-2 w-fit mb-6 md:mb-8 opacity-0">
             <span className="w-1.5 h-1.5 rounded-full bg-matcha-light animate-pulse-dot" />
             <span className="text-[11px] md:text-[12px] text-matcha-light font-semibold uppercase tracking-widest">
-              Livraison fraiche · Chaque matin
+              Livraison les matinées du mardi au vendredi
             </span>
           </div>
 
@@ -68,8 +68,8 @@ export default function Home() {
           </h1>
 
           <p ref={heroSubRef} className="text-creme/60 text-[14px] md:text-[15px] leading-relaxed max-w-sm mb-8 md:mb-12 opacity-0">
-            Fruits, legumes et produits frais selectionnes chaque jour et livres
-            directement chez vous par votre primeur de confiance.
+            Fruits, légumes et produits frais sélectionnés chaque jour et livrés
+            à domicile ou lieu de votre choix (voir zones desservies) par votre primeur.
           </p>
 
           <div ref={heroCtasRef} className="flex flex-col sm:flex-row gap-3 opacity-0">
@@ -105,7 +105,6 @@ export default function Home() {
               <span className="w-2 h-2 rounded-full bg-matcha shrink-0" />
               <span>Fruits et legumes frais du jour</span>
             </div>
-            <span className="text-[12px] md:text-[13px] text-gris">Commandez avant 20h</span>
           </div>
         </div>
       </section>
@@ -117,10 +116,10 @@ export default function Home() {
         </AnimateIn>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mt-4">
           {[
-            { num: '1', icon: '🛍️', titre: 'Je choisis mes produits',  desc: 'Parcourez notre selection fraiche du jour et ajoutez vos fruits et legumes au panier.' },
-            { num: '2', icon: '📦', titre: 'Je passe commande',         desc: 'Validez votre panier avant 20h. Choisissez votre creneau de livraison pour le lendemain.' },
-            { num: '3', icon: '🌅', titre: 'Fornaro prepare',           desc: 'Chaque matin, nous selectionnons et preparons votre commande sur le marche.' },
-            { num: '4', icon: '🚐', titre: 'Livre chez vous',           desc: 'Vos produits sont livres frais a votre porte, directement depuis les halles.', cta: true },
+            { num: '1', icon: '🛍️', titre: 'Je choisis mes produits',  desc: 'Parcourez notre sélection.' },
+            { num: '2', icon: '📦', titre: 'Je passe commande',         desc: 'Validez votre panier. Choisissez votre créneau de livraison.' },
+            { num: '3', icon: '🌅', titre: 'Notre équipe prépare',      desc: 'Chaque matin, nous sélectionnons et préparons votre commande sur le marché.' },
+            { num: '4', icon: '🚐', titre: 'Livré chez vous',           desc: 'Vos produits sont livrés frais à votre porte, directement depuis les halles de Biarritz.', cta: true },
           ].map((s, i) => (
             <AnimateIn key={s.num} delay={i * 0.1} direction="up">
               <div className="bg-white rounded-3xl p-6 md:p-8 border border-creme-dark relative h-full">
@@ -177,13 +176,13 @@ export default function Home() {
         <AnimateIn direction="left" className="bg-creme-dark px-8 md:px-20 py-12 md:py-16 flex flex-col justify-center">
           <p className="section-eyebrow mb-4">Notre histoire</p>
           <p className="font-display text-[24px] md:text-[32px] text-vert leading-snug mb-6">
-            Chez Primeur Fornaro, nous selectionnons chaque jour des fruits et legumes{' '}
+            Chez Fornaro Primeur, nous sélectionnons chaque jour des fruits et légumes de frais.{' '}
             <em className="text-matcha">frais, de saison.</em>
           </p>
           <p className="text-[13px] md:text-[14px] text-gris leading-relaxed">
-            Avec une attention particuliere portee a la qualite et au gout, afin de vous
+            Avec une attention particuliere portée a la qualité et au goût, afin de vous
             proposer des produits authentiques qui respectent le travail des producteurs
-            et le plaisir de bien manger.
+            et le bien manger.
           </p>
         </AnimateIn>
         <AnimateIn direction="right" className="bg-gradient-to-br from-vert-light to-vert flex items-center justify-center text-[80px] md:text-[120px] relative overflow-hidden min-h-[240px] md:min-h-0">
@@ -194,7 +193,7 @@ export default function Home() {
       {/* ── MARCHES ────────────────────────────────────────────── */}
       <section className="px-6 md:px-20 py-16 md:py-24">
         <AnimateIn>
-          <SectionHeader eyebrow="Nous retrouver" title="Venez nous rencontrer au marche" />
+          <SectionHeader eyebrow="Nous retrouver" title="Venez nous rencontrer au marché" />
         </AnimateIn>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
           {marches.map((m, i) => (
@@ -230,8 +229,8 @@ export default function Home() {
         </AnimateIn>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5 mt-4">
           {[
-            { emoji: '🍓', titre: 'Produits en promotion !', desc: 'Ne passez pas a cote de nos offres fraiches de la semaine.', tag: '-20%' },
-            { emoji: '🥗', titre: 'Panier de saison',        desc: 'Composez votre panier avec nos legumes de saison a prix reduit.', tag: 'Offre limitee' },
+            { emoji: '🍓', titre: 'Produits en promotion !', desc: 'Ne passez pas a côté de nos offres fraîches de la semaine.', tag: 'Découvrir' },
+            { emoji: '🥗', titre: 'Panier de saison',        desc: 'Composez votre panier avec nos produits de saison.', tag: 'Offre limitee' },
           ].map((promo, i) => (
             <AnimateIn key={promo.titre} delay={i * 0.15} direction="up">
               <div className="bg-white/5 border border-white/10 rounded-3xl p-6 md:p-8 flex items-center gap-4 md:gap-6">
