@@ -143,7 +143,7 @@ export default function APropos() {
         <AnimateIn>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 text-center">
             {[
-              { num: '20+',  label: "Années d'expérience"   },
+              { num: '40+',  label: "Années d'expérience"   },
               { num: '150+', label: 'Produits sélectionnés' },
               { num: '2',    label: 'Marchés partenaires'   },
               { num: '500+', label: 'Clients satisfaits'    },
