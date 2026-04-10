@@ -139,18 +139,7 @@ export default function FicheProduit() {
               </button>
             </div>
 
-            {/* Livraison */}
-            <div className="bg-creme rounded-2xl px-4 md:px-5 py-3 md:py-4 flex items-center gap-3 border border-creme-dark">
-              <span className="text-xl md:text-2xl">🚐</span>
-              <div>
-                <p className="text-[12px] md:text-[13px] font-medium text-vert">
-                  Livraison le lendemain matin
-                </p>
-                <p className="text-[11px] md:text-[12px] text-gris mt-0.5">
-                  Commandez avant 20h — Biarritz et Hendaye
-                </p>
-              </div>
-            </div>
+            
 
           </div>
         </AnimateIn>

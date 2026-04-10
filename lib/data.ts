@@ -66,7 +66,7 @@ export const categories = [
   { id: 'local',    label: 'Direct producteur', emoji: '🌿', description: 'Retrouvez une sélection de produits de qualité en circuit court',   bg: 'from-purple-50 to-purple-100' },
 ]
 
-export const sousTags = ['Saison', 'À jus & Smoothie', 'À croquer', 'Pour pâtisserie', 'Pour salade', 'Autres']
+export const sousTags = ['Saison', 'À jus & Smoothie', 'À croquer', 'Pour pâtisserie', 'Pour salade', 'Nouveautés']
 
 // ─── MARCHÉS ──────────────────────────────────────────────────────────────────
 

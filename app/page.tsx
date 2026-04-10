@@ -63,7 +63,7 @@ export default function Home() {
           </div>
 
           <h1 ref={heroTitleRef} className="font-display text-4xl md:text-6xl text-creme leading-[1.1] mb-4 md:mb-6 opacity-0">
-            Le meilleur du<br />marche, livré<br />
+            Le meilleur du<br />marché, livré<br />
             <em className="text-matcha-light">chez vous.</em>
           </h1>
 
@@ -176,11 +176,11 @@ export default function Home() {
         <AnimateIn direction="left" className="bg-creme-dark px-8 md:px-20 py-12 md:py-16 flex flex-col justify-center">
           <p className="section-eyebrow mb-4">Notre histoire</p>
           <p className="font-display text-[24px] md:text-[32px] text-vert leading-snug mb-6">
-            Chez Fornaro Primeur, nous sélectionnons chaque jour des fruits et légumes de frais.{' '}
+            Chez Fornaro Primeur, nous sélectionnons chaque jour des fruits et légumes{' '}
             <em className="text-matcha">frais, de saison.</em>
           </p>
           <p className="text-[13px] md:text-[14px] text-gris leading-relaxed">
-            Avec une attention particuliere portée a la qualité et au goût, afin de vous
+            Avec une attention particulière portée a la qualité et au goût, afin de vous
             proposer des produits authentiques qui respectent le travail des producteurs
             et le bien manger.
           </p>

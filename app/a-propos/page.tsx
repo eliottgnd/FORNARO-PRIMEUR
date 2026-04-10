@@ -32,8 +32,8 @@ export default function APropos() {
           <AnimateIn>
             <p className="section-eyebrow text-matcha-light mb-4">Notre histoire</p>
             <h1 className="font-display text-4xl md:text-5xl text-creme leading-tight mb-6">
-              Chez Primeur<br />
-              <em className="text-matcha-light">Fornaro,</em>
+              Chez Fornaro<br />
+              <em className="text-matcha-light">Primeur,</em>
             </h1>
             <p className="text-creme/60 text-[14px] md:text-[15px] leading-relaxed max-w-sm">
               Nous sélectionnons chaque jour des fruits et légumes frais, de saison,
@@ -78,7 +78,6 @@ export default function APropos() {
       {/* ── NOTRE ÉQUIPE ─────────────────────────────────────── */}
       <section className="bg-creme px-6 md:px-20 py-16 md:py-24">
         <AnimateIn>
-          <SectionHeader eyebrow="Les visages de Fornaro" title="Notre équipe" />
         </AnimateIn>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
           {equipe.map((membre, i) => (
@@ -194,9 +193,6 @@ export default function APropos() {
           <h2 className="font-display text-3xl md:text-4xl text-vert mb-6">
             Découvrez nos produits frais
           </h2>
-          <p className="text-gris text-[14px] md:text-[15px] mb-8 max-w-md mx-auto">
-            Commandez avant 20h et recevez vos fruits et légumes frais dès le lendemain matin.
-          </p>
           <Link href="/produits">
             <button className="btn-primary text-[14px] md:text-[15px] px-8 md:px-10 py-3 md:py-4">
               Commander maintenant
