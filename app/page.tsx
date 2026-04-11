@@ -68,7 +68,7 @@ export default function Home() {
           </h1>
 
           <p ref={heroSubRef} className="text-creme/60 text-[14px] md:text-[15px] leading-relaxed max-w-sm mb-8 md:mb-12 opacity-0">
-            Fruits, légumes et produits frais sélectionnés chaque jour et livrés
+            Fruits, légumes frais sélectionnés chaque jour et livrés
             à domicile ou lieu de votre choix (voir zones desservies) par votre primeur.
           </p>
 
