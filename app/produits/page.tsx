@@ -1,17 +1,71 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { produits, categories, sousTags } from '@/lib/data'
+import { categories } from '@/lib/data'
 import { Badge } from '@/components/ui/Badge'
 import { AnimateIn } from '@/components/layout/AnimateIn'
-import { Search, SlidersHorizontal, X, Check } from 'lucide-react'
+import { Search, SlidersHorizontal, X, Check, Loader2, MapPin } from 'lucide-react'
+import { useCartStore } from '@/store/useCartStore'
+import { useToast } from '@/components/providers/ToastProvider'
+import { calculateDiscount } from '@/lib/price-utils'
+import { getProductImage } from '@/lib/product-image-utils'
+import Image from 'next/image'
 
 export default function Produits() {
+  const [produits, setProduits] = useState<any[]>([])
+  const { addItem } = useCartStore()
+  const { showToast } = useToast()
+  const [isLoading, setIsLoading] = useState(true)
   const [categorieActive, setCategorieActive] = useState<string>('tous')
-  const [sousTagActif, setSousTagActif]       = useState<string>('tous')
   const [recherche, setRecherche]             = useState('')
   const [drawerOuvert, setDrawerOuvert]       = useState(false)
+  const [cityFilter, setCityFilter]           = useState('')
+  const [deliveryCities, setDeliveryCities]    = useState<string[]>([])
+
+  useEffect(() => {
+    async function fetchDeliveryCities() {
+      try {
+        const res = await fetch('/api/admin/delivery-settings')
+        if (res.ok) {
+          const data = await res.json()
+          const zones = data.zonesActives ? JSON.parse(data.zonesActives) : []
+          setDeliveryCities(zones)
+        }
+      } catch (e) {
+        console.error("Failed to fetch delivery cities:", e)
+      }
+    }
+    fetchDeliveryCities()
+  }, [])
+
+  useEffect(() => {
+    async function fetchProducts() {
+      try {
+        const url = cityFilter
+          ? `/api/products?city=${encodeURIComponent(cityFilter)}`
+          : '/api/products'
+        const res = await fetch(url)
+        if (res.ok) {
+          const data = await res.json()
+          const mapped = data.map((p: any) => ({
+            ...p,
+            nom: p.name,
+            prix: p.price,
+            unite: p.unit,
+            origine: p.origin,
+            categorie: p.category
+          }))
+          setProduits(mapped)
+        }
+      } catch (e) {
+        console.error("Failed to fetch products:", e)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchProducts()
+  }, [cityFilter])
 
   const produitsFiltres = produits.filter((p) => {
     const matchCat    = categorieActive === 'tous' || p.categorie === categorieActive
@@ -19,12 +73,20 @@ export default function Produits() {
     return matchCat && matchSearch
   })
 
-  const nbFiltresActifs = (categorieActive !== 'tous' ? 1 : 0) + (sousTagActif !== 'tous' ? 1 : 0)
+  const nbFiltresActifs = (categorieActive !== 'tous' ? 1 : 0) + (cityFilter ? 1 : 0)
 
   const resetFiltres = () => {
     setCategorieActive('tous')
-    setSousTagActif('tous')
+    setCityFilter('')
     setDrawerOuvert(false)
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-blanc flex items-center justify-center">
+        <Loader2 className="animate-spin text-vert" size={32} />
+      </div>
+    )
   }
 
   return (
@@ -57,6 +119,19 @@ export default function Produits() {
                 className="input-field pl-10"
               />
             </div>
+            <div className="relative min-w-[160px]">
+              <MapPin size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gris pointer-events-none" />
+              <select
+                value={cityFilter}
+                onChange={(e) => setCityFilter(e.target.value)}
+                className="input-field pl-9 pr-8 appearance-none bg-white cursor-pointer text-[13px]"
+              >
+                <option value="">Toutes les villes</option>
+                {deliveryCities.map((city) => (
+                  <option key={city} value={city}>{city}</option>
+                ))}
+              </select>
+            </div>
             <button
               onClick={() => setDrawerOuvert(true)}
               className="md:hidden flex items-center gap-2 px-4 py-3 rounded-2xl border border-creme-dark bg-white text-[13px] font-medium text-vert relative"
@@ -75,7 +150,7 @@ export default function Produits() {
         {/* ── FILTRES DESKTOP ──────────────────────────────────── */}
         <div className="hidden md:block">
           <AnimateIn delay={0.05}>
-            <div className="flex gap-2 mb-4 flex-wrap">
+            <div className="flex gap-2 mb-10 flex-wrap">
               <button
                 onClick={() => setCategorieActive('tous')}
                 className={`px-5 py-2 rounded-full text-[13px] border transition-all ${
@@ -101,34 +176,6 @@ export default function Produits() {
               ))}
             </div>
           </AnimateIn>
-
-          <AnimateIn delay={0.1}>
-            <div className="flex gap-2 mb-10 flex-wrap">
-              <button
-                onClick={() => setSousTagActif('tous')}
-                className={`px-4 py-1.5 rounded-full text-[12px] border transition-all ${
-                  sousTagActif === 'tous'
-                    ? 'bg-matcha text-white border-matcha font-semibold'
-                    : 'bg-creme text-gris border-transparent hover:border-matcha hover:text-vert'
-                }`}
-              >
-                Tous
-              </button>
-              {sousTags.map((tag) => (
-                <button
-                  key={tag}
-                  onClick={() => setSousTagActif(tag)}
-                  className={`px-4 py-1.5 rounded-full text-[12px] border transition-all ${
-                    sousTagActif === tag
-                      ? 'bg-matcha text-white border-matcha font-semibold'
-                      : 'bg-creme text-gris border-transparent hover:border-matcha hover:text-vert'
-                  }`}
-                >
-                  {tag}
-                </button>
-              ))}
-            </div>
-          </AnimateIn>
         </div>
 
         {/* Filtres actifs mobile */}
@@ -142,10 +189,11 @@ export default function Produits() {
                 </button>
               </span>
             )}
-            {sousTagActif !== 'tous' && (
+            {cityFilter && (
               <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-matcha text-white text-[12px] font-medium">
-                {sousTagActif}
-                <button onClick={() => setSousTagActif('tous')}>
+                <MapPin size={10} />
+                {cityFilter}
+                <button onClick={() => setCityFilter('')}>
                   <X size={12} />
                 </button>
               </span>
@@ -165,35 +213,74 @@ export default function Produits() {
             <p className="text-gris text-[14px]">Essayez un autre filtre ou une autre recherche.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6" key="product-grid">
             {produitsFiltres.map((p, i) => (
-              <AnimateIn key={p.id} delay={i * 0.05} direction="up">
+              <AnimateIn key={`prod-${p.id}`} delay={i * 0.05} direction="up">
                 <Link href={`/produits/${p.id}`}>
                   <div className="card cursor-pointer group">
                     <div
-                      className="aspect-square flex items-center justify-center text-4xl md:text-6xl relative overflow-hidden"
-                      style={{ backgroundColor: p.bgColor }}
+                      className="aspect-square flex items-center justify-center relative overflow-hidden"
+                      style={{ backgroundColor: '#f5f5f5' }}
                     >
-                      <span className="transition-transform group-hover:scale-110 duration-300">
-                        {p.emoji}
-                      </span>
+                      <Image
+                        src={getProductImage(p)}
+                        alt={p.nom}
+                        fill
+                        className="object-cover transition-transform group-hover:scale-110 duration-300"
+                        sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                      />
                       {p.badge && (
-                        <span className="absolute top-2 right-2 md:top-3 md:right-3">
+                        <span className="absolute top-2 right-2 md:top-3 md:right-3 z-10">
                           <Badge label={p.badge} variant="vert" />
                         </span>
                       )}
                     </div>
                     <div className="p-3 md:p-4">
-                      <p className="text-[13px] md:text-[15px] font-medium text-texte">{p.nom}</p>
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-[13px] md:text-[15px] font-medium text-texte">{p.nom}</p>
+                        {(() => {
+                          const { hasPromotion, discountPercent } = calculateDiscount(p);
+                          return hasPromotion ? (
+                            <span className="bg-matcha text-white text-[9px] font-bold px-1.5 rounded-sm shrink-0">
+                              -{discountPercent}%
+                            </span>
+                          ) : null;
+                        })()}
+                      </div>
                       <p className="text-[11px] md:text-[12px] text-gris mt-1 hidden md:block">{p.description}</p>
                       <div className="flex items-center justify-between mt-2 md:mt-3">
-                        <span className="font-display text-[14px] md:text-[17px] text-vert">
-                          {p.prix.toFixed(2)}€
-                          <span className="text-[10px] md:text-[11px] font-body text-gris"> /{p.unite}</span>
-                        </span>
+                        <div className="flex items-center gap-2">
+                          {(() => {
+                            const { originalPrice, discountedPrice, hasPromotion } = calculateDiscount(p);
+                            return (
+                              <>
+                                {hasPromotion && (
+                                  <span className="font-display text-[12px] text-gris line-through">
+                                    {originalPrice.toFixed(2)}€
+                                  </span>
+                                )}
+                                <span className="font-display text-[14px] md:text-[17px] text-vert">
+                                  {discountedPrice.toFixed(2)}€
+                                  <span className="text-[10px] md:text-[11px] font-body text-gris"> /{p.unite}</span>
+                                </span>
+                              </>
+                            );
+                          })()}
+                        </div>
                         <span className="text-[10px] md:text-[11px] text-gris hidden sm:block">{p.origine}</span>
                       </div>
-                      <button className="mt-2 md:mt-4 w-full py-2 md:py-2.5 rounded-xl bg-creme text-vert text-[12px] md:text-[13px] font-medium hover:bg-vert hover:text-white transition-colors">
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault()
+                          const result = addItem(p)
+                          if (result.alreadyExists) {
+                            showToast('Produit déjà ajouté au panier', 'info')
+                          } else {
+                            showToast(`${p.nom} ajouté au panier !`)
+                          }
+                        }}
+                        className="mt-2 md:mt-4 w-full py-2 md:py-2.5 rounded-xl bg-creme text-vert text-[12px] md:text-[13px] font-medium hover:bg-vert hover:text-white transition-colors"
+                      >
                         + Ajouter
                       </button>
                     </div>
@@ -277,26 +364,18 @@ export default function Produits() {
 
             <div className="mb-8">
               <p className="text-[11px] font-semibold uppercase tracking-wider text-gris mb-3">
-                Type
+                Ville de livraison
               </p>
-              <div className="flex flex-wrap gap-2">
-                {['Tous', ...sousTags].map((tag) => {
-                  const val = tag === 'Tous' ? 'tous' : tag
-                  return (
-                    <button
-                      key={tag}
-                      onClick={() => setSousTagActif(val)}
-                      className={`px-4 py-2 rounded-full text-[12px] border transition-all ${
-                        sousTagActif === val
-                          ? 'bg-matcha text-white border-matcha font-semibold'
-                          : 'bg-creme text-gris border-transparent'
-                      }`}
-                    >
-                      {tag}
-                    </button>
-                  )
-                })}
-              </div>
+              <select
+                value={cityFilter}
+                onChange={(e) => setCityFilter(e.target.value)}
+                className="input-field w-full appearance-none bg-white cursor-pointer"
+              >
+                <option value="">Toutes les villes</option>
+                {deliveryCities.map((city) => (
+                  <option key={city} value={city}>{city}</option>
+                ))}
+              </select>
             </div>
 
             <div className="flex gap-3">

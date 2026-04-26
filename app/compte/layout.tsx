@@ -5,6 +5,8 @@ import { usePathname } from 'next/navigation'
 import { clsx } from 'clsx'
 import { ShoppingBag, MapPin, User, Heart, LogOut, Menu, X } from 'lucide-react'
 import { useState } from 'react'
+import { useSession } from 'next-auth/react'
+import { signOut } from 'next-auth/react'
 
 const liens = [
   { label: 'Mes commandes',    href: '/compte/commandes', icon: ShoppingBag },
@@ -15,6 +17,7 @@ const liens = [
 
 export default function CompteLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const { data: session } = useSession()
   const [menuOuvert, setMenuOuvert] = useState(false)
 
   return (
@@ -26,8 +29,8 @@ export default function CompteLayout({ children }: { children: React.ReactNode }
           <div className="w-14 h-14 rounded-2xl bg-creme flex items-center justify-center text-2xl mb-3">
             👤
           </div>
-          <p className="font-display text-lg text-vert">Bienvenue, Jean</p>
-          <p className="text-[12px] text-gris mt-0.5">jean.dupont@email.fr</p>
+          <p className="font-display text-lg text-vert">Bienvenue, {session?.user?.name || 'Utilisateur'}</p>
+          <p className="text-[12px] text-gris mt-0.5">{session?.user?.email}</p>
         </div>
 
         <nav className="flex flex-col gap-1 flex-1">
@@ -46,7 +49,10 @@ export default function CompteLayout({ children }: { children: React.ReactNode }
           ))}
         </nav>
 
-        <button className="flex items-center gap-3 px-4 py-3 rounded-2xl text-[13px] font-medium text-gris hover:bg-red-50 hover:text-red-500 transition-all mt-4">
+        <button
+          onClick={async () => await signOut({ callbackUrl: '/' })}
+          className="flex items-center gap-3 px-4 py-3 rounded-2xl text-[13px] font-medium text-gris hover:bg-red-50 hover:text-red-500 transition-all mt-4"
+        >
           <LogOut size={16} />
           Se déconnecter
         </button>
@@ -59,7 +65,7 @@ export default function CompteLayout({ children }: { children: React.ReactNode }
             👤
           </div>
           <div>
-            <p className="font-display text-[14px] text-vert leading-tight">Bienvenue, Jean</p>
+            <p className="font-display text-[14px] text-vert leading-tight">Bienvenue, {session?.user?.name || 'Utilisateur'}</p>
             <p className="text-[11px] text-gris">Mon espace client</p>
           </div>
         </div>
@@ -87,7 +93,10 @@ export default function CompteLayout({ children }: { children: React.ReactNode }
               </div>
             </Link>
           ))}
-          <button className="flex items-center gap-3 px-4 py-3 rounded-2xl text-[13px] font-medium text-gris hover:bg-red-50 hover:text-red-500 transition-all">
+          <button
+            onClick={async () => await signOut({ callbackUrl: '/' })}
+            className="flex items-center gap-3 px-4 py-3 rounded-2xl text-[13px] font-medium text-gris hover:bg-red-50 hover:text-red-500 transition-all"
+          >
             <LogOut size={16} />
             Se déconnecter
           </button>

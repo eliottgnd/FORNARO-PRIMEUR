@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx prisma:*)",
+      "Bash(npm list:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(curl *)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:developer.sumup.com)",
+      "WebFetch(domain:api.sumup.com)",
+      "WebSearch"
+    ]
+  }
+}

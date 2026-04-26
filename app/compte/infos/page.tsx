@@ -1,25 +1,63 @@
 'use client'
 
-import { useState } from 'react'
-import { utilisateur } from '@/lib/data'
+import { useState, useEffect } from 'react'
 import { AnimateIn } from '@/components/layout/AnimateIn'
+import { useSession } from 'next-auth/react'
 
 export default function Infos() {
+  const { data: session } = useSession()
   const [form, setForm] = useState({
-    prenom:    utilisateur.prenom,
-    nom:       utilisateur.nom,
-    email:     utilisateur.email,
-    telephone: utilisateur.telephone,
+    name: '',
+    phone: '',
   })
+  const [isLoading, setIsLoading] = useState(true)
   const [sauvegarde, setSauvegarde] = useState(false)
+
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        const res = await fetch('/api/user/profile')
+        if (res.ok) {
+          const data = await res.json()
+          setForm({
+            name: data.name || '',
+            phone: data.phone || '',
+          })
+        }
+      } catch (e) {
+        console.error("Failed to fetch profile:", e)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchProfile()
+  }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  const handleSave = () => {
-    setSauvegarde(true)
-    setTimeout(() => setSauvegarde(false), 2000)
+  const handleSave = async () => {
+    setIsLoading(true)
+    try {
+      const res = await fetch('/api/user/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      if (res.ok) {
+        setSauvegarde(true)
+        setTimeout(() => setSauvegarde(false), 2000)
+      }
+    } catch (e) {
+      console.error("Failed to save profile:", e)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  if (isLoading) {
+    return <div className="flex items-center justify-center min-h-[40vh] text-gris">Chargement...</div>
   }
 
   return (
@@ -34,41 +72,18 @@ export default function Infos() {
           <div className="space-y-5">
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
+              <div className="sm:col-span-2">
                 <label className="text-[12px] font-medium text-gris uppercase tracking-wider mb-2 block">
-                  Prénom
+                  Nom complet
                 </label>
                 <input
-                  name="prenom"
-                  value={form.prenom}
+                  name="name"
+                  value={form.name}
                   onChange={handleChange}
                   className="input-field"
+                  placeholder="Jean Dupont"
                 />
               </div>
-              <div>
-                <label className="text-[12px] font-medium text-gris uppercase tracking-wider mb-2 block">
-                  Nom
-                </label>
-                <input
-                  name="nom"
-                  value={form.nom}
-                  onChange={handleChange}
-                  className="input-field"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="text-[12px] font-medium text-gris uppercase tracking-wider mb-2 block">
-                Email
-              </label>
-              <input
-                name="email"
-                type="email"
-                value={form.email}
-                onChange={handleChange}
-                className="input-field"
-              />
             </div>
 
             <div>
@@ -76,11 +91,12 @@ export default function Infos() {
                 Téléphone
               </label>
               <input
-                name="telephone"
+                name="phone"
                 type="tel"
-                value={form.telephone}
+                value={form.phone}
                 onChange={handleChange}
                 className="input-field"
+                placeholder="06 00 00 00 00"
               />
             </div>
 

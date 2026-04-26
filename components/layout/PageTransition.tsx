@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useLayoutEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { gsap } from 'gsap'
 
@@ -9,25 +9,41 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
   const overlayRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const isFirst    = useRef(true)
+  const tlRef      = useRef<gsap.core.Timeline | null>(null)
+
+  // Cleanup any running animations before DOM changes
+  useLayoutEffect(() => {
+    return () => {
+      if (tlRef.current) {
+        tlRef.current.kill()
+        tlRef.current = null
+      }
+    }
+  }, [])
 
   useEffect(() => {
-    if (isFirst.current) {
-      isFirst.current = false
-      gsap.set(overlayRef.current, { yPercent: -100 })
-      return
-    }
-
     const overlay = overlayRef.current
     const content = contentRef.current
     if (!overlay || !content) return
 
+    // Kill any existing animation on these elements
     gsap.killTweensOf([overlay, content])
+    if (tlRef.current) {
+      tlRef.current.kill()
+    }
+
+    if (isFirst.current) {
+      isFirst.current = false
+      gsap.set(overlay, { yPercent: -100 })
+      return
+    }
 
     const tl = gsap.timeline({
       onComplete: () => {
         gsap.set(overlay, { yPercent: -100 })
       }
     })
+    tlRef.current = tl
 
     tl.set(overlay,  { yPercent: 100 })
     tl.to(overlay,   { yPercent: 0,    duration: 0.4, ease: 'power3.inOut' })
@@ -38,7 +54,10 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
       '-=0.15'
     )
 
-    return () => { tl.kill() }
+    return () => {
+      tl.kill()
+      tlRef.current = null
+    }
   }, [pathname])
 
   return (

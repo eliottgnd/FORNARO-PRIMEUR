@@ -1,12 +1,13 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { categories, marches } from '@/lib/data'
 import { SectionHeader } from '@/components/ui/SectionHeader'
 import { AnimateIn } from '@/components/layout/AnimateIn'
+import { AuthModal } from '@/components/ui/AuthModal'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -17,8 +18,15 @@ export default function Home() {
   const heroCtasRef  = useRef<HTMLDivElement>(null)
   const heroCardRef  = useRef<HTMLDivElement>(null)
   const heroRightRef = useRef<HTMLDivElement>(null)
+  const [authModalOpen, setAuthModalOpen] = useState(false)
 
   useEffect(() => {
+    // Check if refs are available before using them
+    if (!heroTagRef.current || !heroTitleRef.current || !heroSubRef.current || 
+        !heroCtasRef.current || !heroCardRef.current || !heroRightRef.current) {
+      return;
+    }
+
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
 
     tl.fromTo(heroTagRef.current,   { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.7 })
@@ -72,14 +80,17 @@ export default function Home() {
             à domicile ou lieu de votre choix (voir zones desservies) par votre primeur.
           </p>
 
-          <div ref={heroCtasRef} className="flex flex-col sm:flex-row gap-3 opacity-0">
-            <Link href="/produits">
-              <button className="btn-primary w-full sm:w-auto">Commander maintenant</button>
-            </Link>
-            <Link href="/compte">
-              <button className="btn-outline-light w-full sm:w-auto">Creer mon compte</button>
-            </Link>
-          </div>
+           <div ref={heroCtasRef} className="flex flex-col sm:flex-row gap-3 opacity-0">
+             <Link href="/produits">
+               <button className="btn-primary w-full sm:w-auto">Commander maintenant</button>
+             </Link>
+             <button
+               onClick={() => setAuthModalOpen(true)}
+               className="btn-outline-light w-full sm:w-auto"
+             >
+               Creer mon compte
+             </button>
+           </div>
         </div>
 
         {/* Droite */}
@@ -107,9 +118,12 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </section>
+       </section>
 
-      {/* ── COMMENT CA FONCTIONNE ──────────────────────────────── */}
+       {/* Auth Modal */}
+       <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} />
+
+       {/* ── COMMENT CA FONCTIONNE ──────────────────────────────── */}
       <section className="px-6 md:px-20 py-16 md:py-24">
         <AnimateIn>
           <SectionHeader eyebrow="Simple et rapide" title="Comment ca fonctionne ?" />
@@ -129,11 +143,14 @@ export default function Home() {
                 <div className="text-3xl mb-4 md:mb-5">{s.icon}</div>
                 <h3 className="font-display text-[16px] md:text-[18px] text-vert mb-2">{s.titre}</h3>
                 <p className="text-[12px] md:text-[13px] text-gris leading-relaxed">{s.desc}</p>
-                {s.cta && (
-                  <Link href="/compte">
-                    <button className="btn-primary mt-4 md:mt-6 text-[13px] w-full sm:w-auto">Creer mon compte</button>
-                  </Link>
-                )}
+                 {s.cta && (
+                   <button
+                     onClick={() => setAuthModalOpen(true)}
+                     className="btn-primary mt-4 md:mt-6 text-[13px] w-full sm:w-auto"
+                   >
+                     Creer mon compte
+                   </button>
+                 )}
               </div>
             </AnimateIn>
           ))}

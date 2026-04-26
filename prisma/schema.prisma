@@ -1,0 +1,158 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "cockroachdb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  name          String?
+  address       String?
+  phone         String?
+  password      String
+  emailVerified DateTime?
+  image         String?
+  role          String   @default("USER")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  orders        Order[]
+  addresses     Address[]
+  favorites     Favorite[]
+
+  @@index([email])
+}
+
+model VerificationCode {
+  id        String   @id @default(uuid())
+  email     String
+  code      String
+  type      String   // "signup" | "password_reset"
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email, code])
+}
+
+model Address {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  label     String
+  street    String
+  city      String
+  zipCode   String?
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders    Order[]
+}
+
+model Product {
+  id            String   @id @default(uuid())
+  name          String
+  description    String?
+  category      String
+  price         Float
+  unit          String
+  origin        String
+  image         String?
+  badge         String?
+  stockQuantity Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  orderItems    OrderItem[]
+  promotions    Promotion[]
+  availabilities ProductAvailability[]
+  favorites      Favorite[]
+}
+
+model ProductAvailability {
+  id        String   @id @default(uuid())
+  productId String
+  city      String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([productId, city])
+}
+
+model Order {
+  id              String   @id @default(uuid())
+  userId           String
+  user            User     @relation(fields: [userId], references: [id])
+  status          String   @default("en-cours") // en-cours, terminee, annulee
+  paymentStatus   String   @default("en-attente") // payee, en-attente, echec
+  paymentId       String?  // SumUp checkout ID
+  total           Float
+  deliveryCost    Float    @default(0)
+  addressId       String?
+  address         Address? @relation(fields: [addressId], references: [id])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  items           OrderItem[]
+}
+
+model OrderItem {
+  id          String @id @default(uuid())
+  orderId     String
+  order       Order  @relation(fields: [orderId], references: [id])
+  productId   String
+  product     Product @relation(fields: [productId], references: [id])
+  quantity    Float
+  priceAtPurchase Float
+}
+
+model Promotion {
+  id              String @id @default(uuid())
+  productId       String?
+  product         Product? @relation(fields: [productId], references: [id])
+  discountPercent Int
+  label           String
+  isActive        Boolean @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model PromoCode {
+  id              String @id @default(uuid())
+  code            String @unique
+  discountPercent Int
+  usageLimit      Int?
+  currentUsage    Int    @default(0)
+  isActive        Boolean @default(true)
+  startDate       DateTime?
+  endDate         DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model GlobalSetting {
+  id        String @id @default(uuid())
+  key       String @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+model Favorite {
+  id        String   @id @default(uuid())
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+}

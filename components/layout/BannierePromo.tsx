@@ -2,11 +2,30 @@
 
 import { useBanniere } from './BanniereContext'
 import { X } from 'lucide-react'
+import { useState, useEffect } from 'react'
 
 export function BannierePromo() {
   const { banniere, setBanniere } = useBanniere()
+  const [initialized, setInitialized] = useState(false)
 
-  if (!banniere.actif) return null
+  useEffect(() => {
+    async function fetchBanner() {
+      try {
+        const res = await fetch('/api/banners')
+        if (res.ok) {
+          const data = await res.json()
+          setBanniere(data)
+        }
+      } catch (e) {
+        console.error("Error fetching banner:", e)
+      } finally {
+        setInitialized(true)
+      }
+    }
+    fetchBanner()
+  }, [])
+
+  if (!initialized || !banniere.actif) return null
 
   const bgClass =
     banniere.couleur === 'matcha' ? 'bg-matcha' :

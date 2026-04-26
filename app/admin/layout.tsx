@@ -1,14 +1,16 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { clsx } from 'clsx'
-import { LayoutDashboard, Package, Tag, Users, Truck, LogOut, Menu, X } from 'lucide-react'
-import { useState } from 'react'
+import { LayoutDashboard, Package, Tag, Users, Truck, LogOut, Menu, X, ShoppingBag } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { useSession, signOut } from 'next-auth/react'
 
 const liens = [
   { label: "Vue d'ensemble",      href: '/admin',            icon: LayoutDashboard },
   { label: 'Gestion des stocks',  href: '/admin/stocks',     icon: Package         },
+  { label: 'Commandes',           href: '/admin/commandes',  icon: ShoppingBag     },
   { label: 'Promotions',          href: '/admin/promotions', icon: Tag             },
   { label: 'Clients',             href: '/admin/clients',    icon: Users           },
   { label: 'Param. livraison',    href: '/admin/livraison',  icon: Truck           },
@@ -16,7 +18,23 @@ const liens = [
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const router = useRouter()
+  const { data: session, status } = useSession()
   const [menuOuvert, setMenuOuvert] = useState(false)
+
+  useEffect(() => {
+    if (status === 'unauthenticated' || (status === 'authenticated' && (session?.user as any)?.role !== 'ADMIN')) {
+      router.push('/compte')
+    }
+  }, [status, session, router])
+
+  if (status === 'loading' || !session || (session.user as any).role !== 'ADMIN') {
+    return (
+      <div className="min-h-screen bg-blanc flex items-center justify-center">
+        <p className="text-gris">Chargement...</p>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-blanc flex flex-col md:flex-row">
@@ -27,8 +45,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="w-14 h-14 rounded-2xl bg-matcha/30 flex items-center justify-center text-2xl mb-3">
             👩‍💼
           </div>
-          <p className="font-display text-lg text-creme">Bonjour, Audrey !</p>
-          <p className="text-[12px] text-creme/40 mt-0.5">Administratrice</p>
+          <p className="font-display text-lg text-creme">Bonjour, {session.user?.name || 'Admin'} !</p>
+          <p className="text-[12px] text-creme/40 mt-0.5">Administrateur</p>
         </div>
         <nav className="flex flex-col gap-1 flex-1">
           {liens.map((l) => (
@@ -45,7 +63,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </Link>
           ))}
         </nav>
-        <button className="flex items-center gap-3 px-4 py-3 rounded-2xl text-[13px] font-medium text-creme/40 hover:bg-white/10 hover:text-white transition-all mt-4">
+        <button
+          onClick={() => signOut({ callbackUrl: '/' })}
+          className="flex items-center gap-3 px-4 py-3 rounded-2xl text-[13px] font-medium text-creme/40 hover:bg-white/10 hover:text-white transition-all mt-4"
+        >
           <LogOut size={16} />
           Se déconnecter
         </button>
@@ -58,8 +79,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             👩‍💼
           </div>
           <div>
-            <p className="font-display text-[14px] text-creme leading-tight">Bonjour, Audrey !</p>
-            <p className="text-[11px] text-creme/40">Administratrice</p>
+            <p className="font-display text-[14px] text-creme leading-tight">Bonjour, {session.user?.name || 'Admin'} !</p>
+            <p className="text-[11px] text-creme/40">Administrateur</p>
           </div>
         </div>
         <button
@@ -86,7 +107,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </div>
             </Link>
           ))}
-          <button className="flex items-center gap-3 px-4 py-3 rounded-2xl text-[13px] font-medium text-creme/40 hover:bg-white/10 hover:text-white transition-all">
+          <button
+            onClick={() => signOut({ callbackUrl: '/' })}
+            className="flex items-center gap-3 px-4 py-3 rounded-2xl text-[13px] font-medium text-creme/40 hover:bg-white/10 hover:text-white transition-all"
+          >
             <LogOut size={16} />
             Se déconnecter
           </button>

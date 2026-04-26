@@ -15,9 +15,9 @@ interface BanniereContextType {
 }
 
 const defaultBanniere: Banniere = {
-  actif:   true,
-  texte:   'Livraison offerte pour toute commande avant 20h ce soir !',
-  emoji:   '🚐',
+  actif:   false,
+  texte:   '',
+  emoji:   '',
   couleur: 'vert',
 }
 
