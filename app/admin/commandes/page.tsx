@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { AnimateIn } from '@/components/layout/AnimateIn'
-import { Search, Loader2, Eye, Download, X, CheckCircle2, Clock, XCircle, ChevronDown } from 'lucide-react'
+import { Search, Loader2, Eye, Download, X, CheckCircle2, Clock, XCircle, ChevronDown, ShoppingBag } from 'lucide-react'
 import { useToast } from '@/components/providers/ToastProvider'
 
 interface OrderItem {
@@ -164,6 +164,20 @@ export default function CommandesPage() {
     revenue: orders.reduce((s, o) => s + o.total, 0),
   }
 
+  useEffect(() => {
+    if (selectedOrder) {
+      if (window.__lenisInstance?.stop) {
+        window.__lenisInstance.stop()
+      }
+
+      return () => {
+        if (window.__lenisInstance?.start) {
+          window.__lenisInstance.start()
+        }
+      }
+    }
+  }, [selectedOrder])
+
   return (
     <div>
       <AnimateIn>
@@ -173,17 +187,17 @@ export default function CommandesPage() {
 
       {/* Stats */}
       <AnimateIn delay={0.1}>
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 md:gap-4 mb-6 md:mb-8">
+        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 md:gap-3 mb-4 md:mb-6">
           {[
             { label: 'Total', valeur: stats.total },
-            { label: 'En cours', valeur: stats.enCours },
+            { label: 'Encours', valeur: stats.enCours },
             { label: 'Terminées', valeur: stats.terminee },
             { label: 'Annulées', valeur: stats.annulee },
-            { label: 'Revenu', valeur: `${stats.revenue.toFixed(2)}€` },
+            { label: 'Revenu', valeur: `${stats.revenue.toFixed(0)}€` },
           ].map((s) => (
-            <div key={s.label} className="bg-white rounded-3xl p-4 md:p-5 border border-creme-dark">
-              <p className="text-[11px] text-gris uppercase tracking-wider mb-1">{s.label}</p>
-              <p className="font-display text-xl md:text-2xl text-vert">{s.valeur}</p>
+            <div key={s.label} className="bg-white rounded-xl p-3 border border-creme-dark">
+              <p className="text-[10px] text-gris uppercase tracking-wider mb-0.5">{s.label}</p>
+              <p className="font-display text-lg md:text-xl text-vert">{s.valeur}</p>
             </div>
           ))}
         </div>
@@ -220,27 +234,27 @@ export default function CommandesPage() {
 
       {/* Orders table */}
       <AnimateIn delay={0.2}>
-        <div className="bg-white rounded-3xl border border-creme-dark overflow-hidden">
+        <div className="bg-white rounded-2xl border border-creme-dark overflow-hidden">
           {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-20 gap-3">
+            <div className="flex flex-col items-center justify-center py-12 gap-3">
               <Loader2 className="animate-spin text-vert" size={24} />
               <p className="text-gris text-sm">Chargement des commandes...</p>
             </div>
           ) : orders.length === 0 ? (
-            <div className="py-20 text-center text-gris text-sm">
+            <div className="py-12 text-center text-gris text-sm">
               {search ? 'Aucune commande trouvée.' : 'Aucune commande enregistrée.'}
             </div>
           ) : (
             <>
               {/* Desktop header */}
-              <div className="hidden md:grid grid-cols-[1.5fr_1.5fr_1fr_80px_90px_100px_60px] px-6 py-3 bg-creme border-b border-creme-dark">
+              <div className="hidden md:grid grid-cols-[1.5fr_1.5fr_1fr_80px_90px_100px_60px] px-6 py-2.5 bg-creme border-b border-creme-dark">
                 {['Commande', 'Client', 'Date', 'Articles', 'Statut', 'Total', ''].map(h => (
-                  <p key={h} className="text-[11px] font-semibold uppercase tracking-wider text-gris">{h}</p>
+                  <p key={h} className="text-[10px] font-semibold uppercase tracking-wider text-gris">{h}</p>
                 ))}
               </div>
 
-              <div className="divide-y divide-creme">
-                {orders.map((order) => (
+              <div className="divide-y divide-creme max-h-[400px] overflow-y-auto">
+                {orders.slice(0, 15).map((order) => (
                   <div key={order.id} className="px-6 py-4 hover:bg-creme/40 transition-colors">
                     {/* Desktop row */}
                     <div className="hidden md:grid grid-cols-[1.5fr_1.5fr_1fr_80px_90px_100px_60px] items-center gap-4">
@@ -290,14 +304,19 @@ export default function CommandesPage() {
       {/* Order detail modal */}
       {selectedOrder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" onClick={() => setSelectedOrder(null)}>
-          <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
+          <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
             {/* Header */}
-            <div className="sticky top-0 bg-white rounded-t-3xl border-b border-creme-dark px-6 py-5 flex items-start justify-between">
-              <div>
-                <p className="font-mono text-vert font-semibold">{selectedOrder.id}</p>
-                <p className="text-xs text-gris mt-1">{new Date(selectedOrder.createdAt).toLocaleString('fr-FR')}</p>
+            <div className="px-6 py-5 border-b border-creme-dark flex items-center justify-between shrink-0 bg-gradient-to-r from-creme to-white rounded-t-3xl">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-2xl bg-vert flex items-center justify-center">
+                  <ShoppingBag size={18} className="text-white" />
+                </div>
+                <div>
+                  <p className="font-mono text-vert font-semibold leading-none">{selectedOrder.id}</p>
+                  <p className="text-xs text-gris mt-0.5">{new Date(selectedOrder.createdAt).toLocaleString('fr-FR')}</p>
+                </div>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <button
                   onClick={() => downloadCSV(selectedOrder)}
                   className="flex items-center gap-2 px-3 py-2 bg-vert text-white text-xs font-medium rounded-xl hover:bg-vert/90 transition-colors"
@@ -305,102 +324,118 @@ export default function CommandesPage() {
                   <Download size={13} />
                   CSV
                 </button>
-                <button onClick={() => setSelectedOrder(null)} className="p-2 hover:bg-creme rounded-xl">
-                  <X size={18} className="text-gris" />
+                <button onClick={() => setSelectedOrder(null)} className="w-9 h-9 rounded-xl bg-creme hover:bg-creme-dark flex items-center justify-center text-gris hover:text-vert transition-all">
+                  <X size={18} />
                 </button>
               </div>
             </div>
 
-            {/* Client & address */}
-            <div className="px-6 py-5 border-b border-creme">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-gris mb-2">Client</p>
-                  <p className="text-sm font-medium text-vert">{selectedOrder.user.name || 'Client'}</p>
-                  <p className="text-xs text-gris">{selectedOrder.user.email}</p>
-                  {selectedOrder.user.phone && <p className="text-xs text-gris">{selectedOrder.user.phone}</p>}
-                </div>
-                {selectedOrder.address && (
+            {/* Body */}
+            <div className="p-6 overflow-y-auto flex-1 space-y-5">
+              {/* Client & address */}
+              <div className="bg-creme/30 rounded-2xl p-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
-                    <p className="text-[11px] font-semibold uppercase tracking-wider text-gris mb-2">Livraison</p>
-                    <p className="text-sm font-medium text-vert">{selectedOrder.address.label}</p>
-                    <p className="text-xs text-gris">{selectedOrder.address.street}</p>
-                    <p className="text-xs text-gris">{selectedOrder.address.city}{selectedOrder.address.zipCode ? `, ${selectedOrder.address.zipCode}` : ''}</p>
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-gris mb-2 flex items-center gap-1.5">
+                      <span className="w-4 h-4 rounded bg-matcha text-white flex items-center justify-center text-[9px] font-bold">C</span>
+                      Client
+                    </p>
+                    <p className="text-sm font-medium text-vert">{selectedOrder.user.name || 'Client'}</p>
+                    <p className="text-xs text-gris mt-0.5">{selectedOrder.user.email}</p>
+                    {selectedOrder.user.phone && <p className="text-xs text-gris">{selectedOrder.user.phone}</p>}
                   </div>
-                )}
-              </div>
-            </div>
-
-            {/* Items */}
-            <div className="px-6 py-5 border-b border-creme">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-gris mb-3">Articles ({selectedOrder.items.length})</p>
-              <div className="space-y-3">
-                {selectedOrder.items.map(item => (
-                  <div key={item.id} className="flex items-center justify-between gap-4 py-2 border-b border-creme/50 last:border-0">
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-vert">{item.product.name}</p>
-                      <p className="text-xs text-gris">{item.product.category} · {item.quantity} {item.product.unit}</p>
+                  {selectedOrder.address && (
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-wider text-gris mb-2 flex items-center gap-1.5">
+                        <span className="w-4 h-4 rounded bg-matcha text-white flex items-center justify-center text-[9px] font-bold">L</span>
+                        Livraison
+                      </p>
+                      <p className="text-sm font-medium text-vert">{selectedOrder.address.label}</p>
+                      <p className="text-xs text-gris">{selectedOrder.address.street}</p>
+                      <p className="text-xs text-gris">{selectedOrder.address.city}{selectedOrder.address.zipCode ? `, ${selectedOrder.address.zipCode}` : ''}</p>
                     </div>
-                    <p className="font-display text-sm font-semibold text-vert">{(item.priceAtPurchase * item.quantity).toFixed(2)}€</p>
-                  </div>
-                ))}
-              </div>
-              <div className="flex justify-between items-center mt-4 pt-3 border-t-2 border-vert">
-                <p className="font-semibold text-vert">Total</p>
-                <p className="font-display text-xl font-bold text-vert">{selectedOrder.total.toFixed(2)}€</p>
-              </div>
-            </div>
-
-            {/* Status controls */}
-            <div className="px-6 py-5 border-b border-creme">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-gris mb-2">Statut commande</p>
-                  <div className="flex flex-wrap gap-2">
-                    {(['en-cours', 'terminee', 'annulee'] as const).map(s => (
-                      <button
-                        key={s}
-                        onClick={() => updateOrderStatus(selectedOrder.id, s)}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border transition-all ${
-                          selectedOrder.status === s
-                            ? STATUS_COLORS[s] + ' border-current'
-                            : 'border-creme-dark text-gris hover:border-vert hover:text-vert'
-                        }`}
-                      >
-                        {s === 'en-cours' && <Clock size={12} />}
-                        {s === 'terminee' && <CheckCircle2 size={12} />}
-                        {s === 'annulee' && <XCircle size={12} />}
-                        {STATUS_LABELS[s]}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-gris mb-2">Paiement</p>
-                  <div className="flex flex-wrap gap-2">
-                    {(['en-attente', 'payee'] as const).map(p => (
-                      <button
-                        key={p}
-                        onClick={() => updateOrderStatus(selectedOrder.id, selectedOrder.status, p)}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border transition-all ${
-                          selectedOrder.paymentStatus === p
-                            ? PAYMENT_COLORS[p] + ' border-current'
-                            : 'border-creme-dark text-gris hover:border-vert hover:text-vert'
-                        }`}
-                      >
-                        {PAYMENT_LABELS[p]}
-                      </button>
-                    ))}
-                  </div>
+                  )}
                 </div>
               </div>
-            </div>
 
-            {/* Download */}
-            <div className="px-6 py-5 flex justify-end">
+              {/* Items */}
+              <div className="bg-creme/30 rounded-2xl p-5">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-gris mb-3 flex items-center gap-1.5">
+                  <span className="w-4 h-4 rounded bg-matcha text-white flex items-center justify-center text-[9px] font-bold">A</span>
+                  Articles ({selectedOrder.items.length})
+                </p>
+                <div className="space-y-2">
+                  {selectedOrder.items.map(item => (
+                    <div key={item.id} className="flex items-center justify-between gap-4 py-2 border-b border-creme/50 last:border-0">
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-vert">{item.product.name}</p>
+                        <p className="text-xs text-gris">{item.product.category} · {item.quantity} {item.product.unit}</p>
+                      </div>
+                      <p className="font-display text-sm font-semibold text-vert">{(item.priceAtPurchase * item.quantity).toFixed(2)}€</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex justify-between items-center mt-4 pt-3 border-t-2 border-vert">
+                  <p className="font-semibold text-vert">Total</p>
+                  <p className="font-display text-xl font-bold text-vert">{selectedOrder.total.toFixed(2)}€</p>
+                </div>
+              </div>
+
+              {/* Status controls */}
+              <div className="bg-creme/30 rounded-2xl p-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-gris mb-3 flex items-center gap-1.5">
+                      <span className="w-4 h-4 rounded bg-matcha text-white flex items-center justify-center text-[9px] font-bold">S</span>
+                      Statut commande
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {(['en-cours', 'terminee', 'annulee'] as const).map(s => (
+                        <button
+                          key={s}
+                          onClick={() => updateOrderStatus(selectedOrder.id, s)}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border transition-all ${
+                            selectedOrder.status === s
+                              ? STATUS_COLORS[s] + ' border-current'
+                              : 'border-creme-dark text-gris hover:border-vert hover:text-vert'
+                          }`}
+                        >
+                          {s === 'en-cours' && <Clock size={12} />}
+                          {s === 'terminee' && <CheckCircle2 size={12} />}
+                          {s === 'annulee' && <XCircle size={12} />}
+                          {STATUS_LABELS[s]}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-gris mb-3 flex items-center gap-1.5">
+                      <span className="w-4 h-4 rounded bg-matcha text-white flex items-center justify-center text-[9px] font-bold">P</span>
+                      Paiement
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {(['en-attente', 'payee'] as const).map(p => (
+                        <button
+                          key={p}
+                          onClick={() => updateOrderStatus(selectedOrder.id, selectedOrder.status, p)}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border transition-all ${
+                            selectedOrder.paymentStatus === p
+                              ? PAYMENT_COLORS[p] + ' border-current'
+                              : 'border-creme-dark text-gris hover:border-vert hover:text-vert'
+                          }`}
+                        >
+                          {PAYMENT_LABELS[p]}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Download */}
               <button
                 onClick={() => downloadCSV(selectedOrder)}
-                className="flex items-center gap-2 px-5 py-3 bg-vert text-white rounded-2xl font-medium text-sm hover:bg-vert/90 transition-colors"
+                className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-vert text-white rounded-2xl font-medium text-sm hover:bg-vert/90 transition-colors shadow-lg shadow-vert/20"
               >
                 <Download size={16} />
                 Télécharger le CSV

@@ -7,6 +7,20 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 gsap.registerPlugin(ScrollTrigger)
 
+declare global {
+  interface Window {
+    __lenisInstance?: Lenis | null
+  }
+}
+
+function isScrollable(element: HTMLElement | null): boolean {
+  if (!element) return false
+  if (element.classList.contains('overflow-y-auto') || element.classList.contains('overflow-y-scroll')) {
+    return element.scrollHeight > element.clientHeight + 1
+  }
+  return isScrollable(element.parentElement)
+}
+
 export function SmoothScroll({ children }: { children: React.ReactNode }) {
   const lenisRef = useRef<Lenis | null>(null)
   const rafCallbackRef = useRef<((time: number) => void) | null>(null)
@@ -38,13 +52,56 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
       }
 
       const lenis = new Lenis({
-        duration: 1.4,
+        duration: 1.2,
         easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
         smoothWheel: true,
+        gestureOrientation: 'vertical',
+        wheelMultiplier: 1,
+        touchMultiplier: 2,
+        infinite: false,
       })
       lenisRef.current = lenis
 
+      window.__lenisInstance = lenis
+
       lenis.on('scroll', ScrollTrigger.update)
+
+      // Skip wheel/touch isolation on /admin/promotions page
+      const isPromotionsPage = () => window.location.pathname === '/admin/promotions'
+
+      // Stop wheel events from scrollable containers before Lenis processes them
+      const handleWheel = (e: WheelEvent) => {
+        const target = e.target as HTMLElement | null
+        if (!target || isPromotionsPage()) return
+        if (isScrollable(target)) {
+          e.stopImmediatePropagation()
+        }
+      }
+
+      const handleTouchStart = (e: TouchEvent) => {
+        const target = e.target as HTMLElement | null
+        if (!target || isPromotionsPage()) return
+        if (isScrollable(target)) {
+          if (lenisRef.current) {
+            lenisRef.current.stop()
+          }
+        }
+      }
+
+      const handleTouchEnd = () => {
+        if (lenisRef.current) {
+          lenisRef.current.start()
+        }
+      }
+
+      document.addEventListener('wheel', handleWheel, { capture: true, passive: false })
+      document.addEventListener('touchstart', handleTouchStart, { capture: true, passive: true })
+
+      // Store cleanup for these listeners
+      ;(lenis as any).__cleanupWheel = () => {
+        document.removeEventListener('wheel', handleWheel, { capture: true })
+        document.removeEventListener('touchstart', handleTouchStart, { capture: true })
+      }
 
       const rafCallback = (time: number) => {
         lenis.raf(time * 1000)
@@ -57,8 +114,10 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
 
     const destroyLenis = () => {
       if (lenisRef.current) {
+        ;(lenisRef.current as any).__cleanupWheel?.()
         lenisRef.current.destroy()
         lenisRef.current = null
+        window.__lenisInstance = null
       }
       if (rafCallbackRef.current) {
         gsap.ticker.remove(rafCallbackRef.current)
@@ -66,12 +125,10 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
       }
     }
 
-    // Watch for Google Translate elements
     translateObserver = new MutationObserver((mutations) => {
       for (const mutation of mutations) {
         for (const node of mutation.addedNodes) {
           if (node instanceof Element) {
-            // Google Translate injects a toolbar AND replaces page content
             if (node.classList?.contains('goog-toolbar') ||
                 node.id?.startsWith('google_translate') ||
                 node.classList?.contains('skiptranslate') ||
@@ -91,7 +148,6 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
             if (node.classList?.contains('goog-toolbar') ||
                 node.id?.startsWith('google_translate') ||
                 node.classList?.contains('skiptranslate')) {
-              // Translation was cancelled - reinitialize after a delay
               setTimeout(() => {
                 isTranslatedRef.current = false
                 initLenis()
@@ -102,7 +158,6 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
         }
       }
 
-      // Also check if body classes changed (another indicator of translation)
       if (document.body.classList.contains('translated-ltr') ||
           document.body.classList.contains('translated-rtl')) {
         if (!isTranslatedRef.current) {
@@ -112,7 +167,6 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
       }
     })
 
-    // Watch for body class changes which indicate translation state
     const bodyObserver = new MutationObserver(() => {
       if (document.body.classList.contains('translated-ltr') ||
           document.body.classList.contains('translated-rtl')) {
@@ -140,7 +194,6 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
       attributeFilter: ['class'],
     })
 
-    // Initialize Lenis
     initLenis()
 
     return () => {

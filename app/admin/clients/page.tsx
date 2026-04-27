@@ -55,15 +55,15 @@ export default function Clients() {
 
       {/* Stats */}
       <AnimateIn delay={0.1}>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-6 md:mb-8">
+        <div className="grid grid-cols-3 gap-2 md:gap-3 mb-4 md:mb-6">
           {[
-            { label: 'Total clients',      valeur: totalClients },
-            { label: 'Commandes moyennes', valeur: avgOrders },
-            { label: 'Panier moyen',       valeur: `${avgBasket}€` },
+            { label: 'Clients',        valeur: totalClients },
+            { label: 'Cmd/Client',     valeur: avgOrders },
+            { label: 'Panier Moyen',   valeur: `${avgBasket}€` },
           ].map((s) => (
-            <div key={s.label} className="bg-white rounded-3xl p-5 md:p-6 border border-creme-dark">
-              <p className="text-[12px] text-gris uppercase tracking-wider mb-1">{s.label}</p>
-              <p className="font-display text-2xl md:text-3xl text-vert">{s.valeur}</p>
+            <div key={s.label} className="bg-white rounded-xl p-3 border border-creme-dark">
+              <p className="text-[10px] text-gris uppercase tracking-wider mb-0.5">{s.label}</p>
+              <p className="font-display text-lg md:text-xl text-vert">{s.valeur}</p>
             </div>
           ))}
         </div>
@@ -94,22 +94,22 @@ export default function Clients() {
           ) : (
             <>
               {/* Header desktop */}
-              <div className="hidden md:grid grid-cols-[2fr_2fr_1fr_1fr] px-6 py-3 bg-creme border-b border-creme-dark">
+              <div className="hidden md:grid grid-cols-[2fr_2fr_1fr_1fr] px-6 py-2.5 bg-creme border-b border-creme-dark">
                 {['Client', 'Email', 'Commandes', 'Total'].map((h) => (
-                  <p key={h} className="text-[11px] font-semibold uppercase tracking-wider text-gris">{h}</p>
+                  <p key={h} className="text-[10px] font-semibold uppercase tracking-wider text-gris">{h}</p>
                 ))}
               </div>
 
-              <div className="divide-y divide-creme">
+              <div className="divide-y divide-creme max-h-[320px] overflow-y-auto">
                 {clientsFiltres.length === 0 ? (
-                  <div className="py-20 text-center text-gris text-sm">
+                  <div className="py-12 text-center text-gris text-sm">
                     {recherche ? 'Aucun client trouvé.' : 'Aucun client enregistré.'}
                   </div>
                 ) : (
-                  clientsFiltres.map((c) => (
+                  clientsFiltres.slice(0, 10).map((c) => (
                     <div key={c.id}>
                       {/* Desktop */}
-                      <div className="hidden md:grid grid-cols-[2fr_2fr_1fr_1fr] px-6 py-4 items-center hover:bg-creme/40 transition-colors">
+                      <div className="hidden md:grid grid-cols-[2fr_2fr_1fr_1fr] px-6 py-3 items-center hover:bg-creme/40 transition-colors">
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-xl bg-creme flex items-center justify-center text-matcha font-semibold text-[13px]">
                             {c.name ? c.name[0] : '?'}

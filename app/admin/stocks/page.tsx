@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { AnimateIn } from '@/components/layout/AnimateIn'
-import { Search, Pencil, Plus, Loader2, X, Trash2 } from 'lucide-react'
+import { Search, Pencil, Plus, Loader2, X, Trash2, Package } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { getProductImagePreview, getProductImage } from '@/lib/product-image-utils'
 
@@ -72,27 +72,16 @@ export default function Stocks() {
 
   useEffect(() => {
     if (isModalOpen) {
-      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
-      document.body.style.overflow = 'hidden'
-      document.documentElement.style.overflow = 'hidden'
-      document.body.style.paddingRight = `${scrollbarWidth}px`
-
-      const handleWheel = (e: WheelEvent) => {
-        e.preventDefault()
-        e.stopPropagation()
+      // Pause Lenis smooth scroll while modal is open
+      if (window.__lenisInstance?.stop) {
+        window.__lenisInstance.stop()
       }
 
-      window.addEventListener('wheel', handleWheel, { passive: false })
       return () => {
-        window.removeEventListener('wheel', handleWheel)
-        document.body.style.overflow = ''
-        document.documentElement.style.overflow = ''
-        document.body.style.paddingRight = ''
+        if (window.__lenisInstance?.start) {
+          window.__lenisInstance.start()
+        }
       }
-    } else {
-      document.body.style.overflow = ''
-      document.documentElement.style.overflow = ''
-      document.body.style.paddingRight = ''
     }
   }, [isModalOpen])
 
@@ -263,15 +252,15 @@ export default function Stocks() {
                 ))}
               </div>
 
-              <div className="divide-y divide-creme">
+              <div className="divide-y divide-creme max-h-[400px] overflow-y-auto">
                 {produitsFiltres.length === 0 ? (
-                  <div className="py-20 text-center text-gris text-sm">
+                  <div className="py-12 text-center text-gris text-sm">
                     {recherche ? 'Aucun produit trouvé.' : 'Aucun produit en stock.'}
                   </div>
                 ) : (
-                  produitsFiltres.map((p) => (
+                  produitsFiltres.slice(0, 10).map((p) => (
                     <div key={p.id}>
-                      <div className="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr_80px] px-6 py-4 items-center hover:bg-creme/40 transition-colors">
+                      <div className="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr_80px] px-6 py-3 items-center hover:bg-creme/40 transition-colors">
                         <div className="flex items-center gap-3">
                           <div
                             className="w-10 h-10 rounded-xl flex items-center justify-center text-xl overflow-hidden"
@@ -317,7 +306,7 @@ export default function Stocks() {
                         </div>
                       </div>
 
-                      <div className="md:hidden px-4 py-4 flex items-center justify-between gap-3">
+                      <div className="md:hidden px-4 py-3 flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3">
                           <div
                             className="w-11 h-11 rounded-2xl flex items-center justify-center text-2xl shrink-0 overflow-hidden"
@@ -399,148 +388,224 @@ export default function Stocks() {
       )}
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-blanc/50 backdrop-blur-sm p-4 overflow-hidden">
-          <div className="relative w-full max-w-4xl max-h-[80vh] bg-white rounded-3xl shadow-2xl border border-creme-dark overflow-hidden flex flex-col stocks-modal-inner">
-            <div className="px-6 py-4 border-b border-creme-dark flex items-center justify-between bg-creme/30 shrink-0">
-              <h2 className="font-display text-xl text-vert">
-                {editingProduct ? 'Modifier le produit' : 'Ajouter un produit'}
-              </h2>
-              <button onClick={() => setIsModalOpen(false)} className="text-gris hover:text-vert transition-colors">
-                <X size={20} />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-vert/20 backdrop-blur-md p-4" onClick={() => setIsModalOpen(false)}>
+          <div className="relative w-full max-w-3xl bg-white rounded-3xl shadow-2xl border border-creme-dark flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
+            {/* Header */}
+            <div className="px-6 py-5 border-b border-creme-dark flex items-center justify-between shrink-0 bg-gradient-to-r from-creme to-white rounded-t-3xl">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-2xl bg-vert flex items-center justify-center">
+                  <Package size={18} className="text-white" />
+                </div>
+                <div>
+                  <h2 className="font-display text-xl text-vert leading-none">
+                    {editingProduct ? 'Modifier le produit' : 'Ajouter un produit'}
+                  </h2>
+                  <p className="text-[12px] text-gris mt-0.5">
+                    {editingProduct ? `Édition de "${editingProduct.name}"` : 'Créer un nouveau produit'}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="w-9 h-9 rounded-xl bg-creme hover:bg-creme-dark flex items-center justify-center text-gris hover:text-vert transition-all"
+              >
+                <X size={18} />
               </button>
             </div>
-            <form onSubmit={handleSaveProduct} className="p-6 space-y-4 overflow-y-auto flex-1 modal-scrollable" tabIndex={-1} style={{ outline: 'none' }}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-[12px] font-medium text-gris">Nom du produit</label>
-                  <input name="name" defaultValue={editingProduct?.name || ''} required className="input-field w-full" />
+
+            {/* Body */}
+            <form onSubmit={handleSaveProduct} className="p-6 overflow-y-auto flex-1 space-y-6" tabIndex={-1} style={{ outline: 'none' }}>
+              {/* Basic Info */}
+              <div className="bg-creme/30 rounded-2xl p-5">
+                <h3 className="text-[11px] font-semibold uppercase tracking-wider text-gris mb-4 flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-lg bg-vert text-white flex items-center justify-center text-[10px] font-bold">1</span>
+                  Informations de base
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[12px] font-medium text-texte">Nom du produit</label>
+                    <input name="name" defaultValue={editingProduct?.name || ''} required className="input-field w-full" placeholder="Ex: Pommes Golden" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <label className="text-[12px] font-medium text-texte">Catégorie</label>
+                      <select name="category" defaultValue={editingProduct?.category || 'fruits'} className="input-field w-full">
+                        <option value="fruits">Fruits</option>
+                        <option value="legumes">Légumes</option>
+                        <option value="epicerie">Épicerie</option>
+                        <option value="local">Local</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[12px] font-medium text-texte">Badge</label>
+                      <input name="badge" defaultValue={editingProduct?.badge || ''} className="input-field w-full" placeholder="Ex: Bio" />
+                    </div>
+                  </div>
                 </div>
-                <div className="space-y-1">
-                  <label className="text-[12px] font-medium text-gris">Catégorie</label>
-                  <select name="category" defaultValue={editingProduct?.category || 'fruits'} className="input-field w-full">
-                    <option value="fruits">Fruits</option>
-                    <option value="legumes">Légumes</option>
-                    <option value="epicerie">Épicerie</option>
-                    <option value="local">Local</option>
-                  </select>
+              </div>
+
+              {/* Pricing */}
+              <div className="bg-creme/30 rounded-2xl p-5">
+                <h3 className="text-[11px] font-semibold uppercase tracking-wider text-gris mb-4 flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-lg bg-vert text-white flex items-center justify-center text-[10px] font-bold">2</span>
+                  Prix et disponibilité
+                </h3>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[12px] font-medium text-texte">Prix (€)</label>
+                    <input name="price" type="number" step="0.01" defaultValue={editingProduct?.price || ''} required className="input-field w-full" placeholder="0.00" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[12px] font-medium text-texte">Unité</label>
+                    <input name="unit" defaultValue={editingProduct?.unit || 'kg'} required className="input-field w-full" placeholder="kg, botte..." />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[12px] font-medium text-texte">Stock</label>
+                    <input name="stockQuantity" type="number" defaultValue={editingProduct?.stockQuantity || 0} className="input-field w-full" placeholder="0" />
+                  </div>
                 </div>
-                <div className="space-y-1">
-                  <label className="text-[12px] font-medium text-gris">Prix (€)</label>
-                  <input name="price" type="number" step="0.01" defaultValue={editingProduct?.price || ''} required className="input-field w-full" />
+                <div className="mt-4 space-y-1.5">
+                  <label className="text-[12px] font-medium text-texte">Origine</label>
+                  <input name="origin" defaultValue={editingProduct?.origin || ''} required className="input-field w-full" placeholder="Ex: France, Espagne..." />
                 </div>
-                <div className="space-y-1">
-                  <label className="text-[12px] font-medium text-gris">Unité (ex: kg, botte)</label>
-                  <input name="unit" defaultValue={editingProduct?.unit || 'kg'} required className="input-field w-full" />
+              </div>
+
+              {/* Description */}
+              <div className="bg-creme/30 rounded-2xl p-5">
+                <h3 className="text-[11px] font-semibold uppercase tracking-wider text-gris mb-4 flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-lg bg-vert text-white flex items-center justify-center text-[10px] font-bold">3</span>
+                  Description
+                </h3>
+                <textarea
+                  name="description"
+                  defaultValue={editingProduct?.description || ''}
+                  className="input-field w-full h-20 resize-none"
+                  placeholder="Décrivez le produit..."
+                />
+              </div>
+
+              {/* Availability */}
+              <div className="bg-creme/30 rounded-2xl p-5">
+                <h3 className="text-[11px] font-semibold uppercase tracking-wider text-gris mb-4 flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-lg bg-vert text-white flex items-center justify-center text-[10px] font-bold">4</span>
+                  Villes de disponibilité
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {deliveryCities.map((city) => (
+                    <button
+                      type="button"
+                      key={city}
+                      onClick={() => toggleCity(city)}
+                      className={`px-3 py-1.5 rounded-xl text-[11px] font-medium transition-all border ${
+                        selectedCities.includes(city)
+                          ? 'bg-vert text-white border-vert shadow-sm'
+                          : 'bg-white text-gris border-creme-dark hover:border-vert hover:text-vert'
+                      }`}
+                    >
+                      {city}
+                    </button>
+                  ))}
+                  {deliveryCities.length === 0 && loadingCities === false && (
+                    <p className="text-gris text-[11px] italic">Aucune ville configurée.</p>
+                  )}
                 </div>
-                <div className="space-y-1">
-                  <label className="text-[12px] font-medium text-gris">Origine</label>
-                  <input name="origin" defaultValue={editingProduct?.origin || ''} required className="input-field w-full" />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[12px] font-medium text-gris">Image du produit (.webp uniquement)</label>
-                  <div className="flex flex-col gap-2">
-                    <div className="flex gap-2">
-                      <input
-                        type="file"
-                        accept=".webp"
-                        onChange={handleImageUpload}
-                        className="hidden"
-                        id="product-image-upload"
-                      />
-                      <label
-                        htmlFor="product-image-upload"
-                        className="btn-secondary text-[12px] px-3 py-1.5 cursor-pointer flex items-center justify-center gap-2"
+                {selectedCities.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    <span className="text-[11px] text-gris self-center">Sélectionnées:</span>
+                    {selectedCities.map((city) => (
+                      <span
+                        key={city}
+                        className="px-2.5 py-1 bg-vert/10 text-vert text-[11px] font-medium rounded-lg flex items-center gap-1.5"
                       >
-                        {uploadingImage ? <Loader2 size={12} className="animate-spin" /> : null}
-                        {uploadingImage ? 'Téléchargement...' : 'Choisir une image'}
-                      </label>
+                        {city}
+                        <button onClick={() => removeCity(city)} className="hover:text-red-500 transition-colors">
+                          <X size={10} />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <input type="hidden" name="cities" value={selectedCities.join(',')} />
+              </div>
+
+              {/* Image */}
+              <div className="bg-creme/30 rounded-2xl p-5">
+                <h3 className="text-[11px] font-semibold uppercase tracking-wider text-gris mb-4 flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-lg bg-vert text-white flex items-center justify-center text-[10px] font-bold">5</span>
+                  Image du produit
+                </h3>
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept=".webp"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    id="product-image-upload"
+                  />
+                  <label
+                    htmlFor="product-image-upload"
+                    className="relative flex flex-col items-center justify-center w-full aspect-square rounded-2xl border-2 border-dashed border-creme-dark hover:border-vert cursor-pointer transition-all bg-white hover:bg-creme/30 group"
+                  >
+                    {uploadingImage ? (
+                      <div className="flex flex-col items-center gap-2">
+                        <Loader2 size={24} className="animate-spin text-vert" />
+                        <span className="text-[12px] text-gris">Téléchargement...</span>
+                      </div>
+                    ) : currentImage || editingProduct?.image ? (
+                      <img
+                        src={`/${currentImage || editingProduct?.image}`}
+                        alt="Preview"
+                        className="w-full h-full object-cover rounded-2xl"
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="w-12 h-12 rounded-xl bg-creme flex items-center justify-center text-gris group-hover:bg-vert/10 group-hover:text-vert transition-colors">
+                          <Plus size={20} />
+                        </div>
+                        <span className="text-[12px] text-gris group-hover:text-vert transition-colors">Choisir une image</span>
+                        <span className="text-[10px] text-gris/60">Format .webp uniquement</span>
+                      </div>
+                    )}
+                  </label>
+                  {(currentImage || editingProduct?.image) && (
+                    <div className="mt-3">
                       <input
                         name="image"
                         value={currentImage || editingProduct?.image || ''}
                         readOnly
-                        className="input-field flex-1 text-[12px] bg-creme/50"
-                        placeholder="Nom du fichier image"
+                        className="input-field w-full text-[11px] bg-white"
+                        placeholder="fichier.webp"
                       />
                     </div>
-                    {currentImage && (
-                      <div className="w-12 h-12 rounded-lg overflow-hidden border border-creme-dark">
-                        <img src={`/${currentImage}`} alt="Preview" className="w-full h-full object-cover" />
-                      </div>
-                    )}
-                  </div>
+                  )}
                 </div>
-                <div className="space-y-1">
-                  <label className="text-[12px] font-medium text-gris">Badge (Optionnel)</label>
-                  <input name="badge" defaultValue={editingProduct?.badge || ''} className="input-field w-full" />
-                </div>
-                <div className="space-y-1 md:col-span-2">
-                  <label className="text-[12px] font-medium text-gris">Description</label>
-                  <textarea
-                    name="description"
-                    defaultValue={editingProduct?.description || ''}
-                    className="input-field w-full h-24 resize-none"
-                  />
-                </div>
-                <div className="space-y-1 md:col-span-2">
-                  <label className="text-[12px] font-medium text-gris">Quantité en stock</label>
-                  <input name="stockQuantity" type="number" defaultValue={editingProduct?.stockQuantity || 0} className="input-field w-full" />
-                </div>
-                <div className="space-y-1 md:col-span-2">
-                  <label className="text-[12px] font-medium text-gris">Villes de disponibilité</label>
-                  <div className="space-y-3">
-                    <div className="flex flex-wrap gap-2">
-                      {deliveryCities.map((city) => (
-                        <button
-                          type="button"
-                          key={city}
-                          onClick={() => toggleCity(city)}
-                          className={`px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all border ${
-                            selectedCities.includes(city)
-                              ? 'bg-vert text-white border-vert shadow-sm'
-                              : 'bg-white text-gris border-creme-dark hover:border-vert hover:text-vert'
-                          }`}
-                        >
-                          {city}
-                        </button>
-                      ))}
-                      {deliveryCities.length === 0 && loadingCities === false && (
-                        <p className="text-gris text-[11px] italic">Aucune ville configurée dans les paramètres de livraison.</p>
-                      )}
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedCities.map((city) => (
-                        <span
-                          key={city}
-                          className="px-2 py-1 bg-vert/10 text-vert text-[11px] font-medium rounded-lg flex items-center gap-1"
-                        >
-                          {city}
-                          <button onClick={() => removeCity(city)} className="hover:text-red-500">
-                            <X size={10} />
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                    <input type="hidden" name="cities" value={selectedCities.join(',')} />
-                  </div>
-                </div>
-              </div>
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="flex-1 py-2 text-[13px] font-medium text-gris hover:text-texte transition-colors"
-                >
-                  Annuler
-                </button>
-                <Button
-                  type="submit"
-                  className="flex-1"
-                  disabled={saveLoading}
-                >
-                  {saveLoading ? 'Enregistrement...' : 'Enregistrer'}
-                </Button>
               </div>
             </form>
+
+            {/* Footer */}
+            <div className="px-6 py-4 border-t border-creme-dark flex gap-3 shrink-0 bg-white rounded-b-3xl">
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                className="flex-1 py-3 text-[13px] font-medium text-gris hover:text-texte hover:bg-creme/50 rounded-2xl transition-colors"
+              >
+                Annuler
+              </button>
+              <button
+                type="submit"
+                disabled={saveLoading}
+                className="flex-1 py-3 px-6 bg-vert text-white rounded-2xl font-medium text-[13px] hover:bg-vert-mid transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-vert/20"
+              >
+                {saveLoading ? (
+                  <>
+                    <Loader2 size={14} className="animate-spin" />
+                    Enregistrement...
+                  </>
+                ) : (
+                  editingProduct ? 'Mettre à jour' : 'Ajouter le produit'
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}

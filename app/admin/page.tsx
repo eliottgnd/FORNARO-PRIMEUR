@@ -274,19 +274,19 @@ export default function AdminDashboard() {
       </AnimateIn>
 
       <AnimateIn delay={0.1}>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
           {[
             { icon: ShoppingBag, label: 'Commandes',    valeur: kpis?.orders || 0,       suffix: '',    color: 'text-matcha' },
             { icon: TrendingUp,  label: 'Revenu',       valeur: kpis?.revenue?.toFixed(0) || '0', suffix: '€',   color: 'text-vert'   },
             { icon: Users,       label: 'Clients',      valeur: kpis?.clients || 0,          suffix: '',    color: 'text-matcha' },
             { icon: Package,     label: 'Produits',     valeur: kpis?.products || 0,         suffix: '',    color: 'text-vert'   },
           ].map((kpi: KPI) => (
-            <div key={kpi.label} className="bg-white rounded-3xl p-4 md:p-6 border border-creme-dark">
-              <div className={`w-9 h-9 md:w-10 md:h-10 rounded-xl bg-creme flex items-center justify-center ${kpi.color} mb-3 md:mb-4`}>
-                <kpi.icon size={17} />
+            <div key={kpi.label} className="bg-white rounded-2xl p-4 border border-creme-dark">
+              <div className={`w-8 h-8 rounded-lg bg-creme flex items-center justify-center ${kpi.color} mb-2`}>
+                <kpi.icon size={15} />
               </div>
-              <p className="text-[11px] md:text-[12px] text-gris uppercase tracking-wider">{kpi.label}</p>
-              <p className="font-display text-2xl md:text-3xl text-vert mt-1">
+              <p className="text-[10px] text-gris uppercase tracking-wider">{kpi.label}</p>
+              <p className="font-display text-xl md:text-2xl text-vert mt-0.5">
                 {kpi.valeur}{kpi.suffix}
               </p>
             </div>
@@ -294,13 +294,13 @@ export default function AdminDashboard() {
         </div>
       </AnimateIn>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
         <AnimateIn delay={0.15}>
-          <div className="bg-white rounded-3xl border border-creme-dark p-5 md:p-6">
-            <h2 className="font-display text-lg md:text-xl text-vert mb-4 md:mb-6">Statut des commandes</h2>
-            <ResponsiveContainer width="100%" height={220}>
+          <div className="bg-white rounded-2xl border border-creme-dark p-4 md:p-5">
+            <h2 className="font-display text-base md:text-lg text-vert mb-3 md:mb-4">Statut des commandes</h2>
+            <ResponsiveContainer width="100%" height={180}>
               <PieChart>
-                <Pie data={dataStatuts} cx="50%" cy="50%" innerRadius={55} outerRadius={90} paddingAngle={4} dataKey="value">
+                <Pie data={dataStatuts} cx="50%" cy="50%" innerRadius={45} outerRadius={75} paddingAngle={4} dataKey="value">
                   {dataStatuts.map((_: { name: string; value: number }, i: number) => <Cell key={i} fill={COLORS[i]} />)}
                 </Pie>
                 <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #ede6d6', fontSize: '13px' }} />
@@ -311,11 +311,11 @@ export default function AdminDashboard() {
         </AnimateIn>
 
         <AnimateIn delay={0.2}>
-          <div className="bg-white rounded-3xl border border-creme-dark p-5 md:p-6">
-            <h2 className="font-display text-lg md:text-xl text-vert mb-4 md:mb-6">Produits par categorie</h2>
-            <ResponsiveContainer width="100%" height={220}>
+          <div className="bg-white rounded-2xl border border-creme-dark p-4 md:p-5">
+            <h2 className="font-display text-base md:text-lg text-vert mb-3 md:mb-4">Produits par categorie</h2>
+            <ResponsiveContainer width="100%" height={180}>
               <PieChart>
-                <Pie data={dataCategories} cx="50%" cy="50%" innerRadius={55} outerRadius={90} paddingAngle={4} dataKey="value">
+                <Pie data={dataCategories} cx="50%" cy="50%" innerRadius={45} outerRadius={75} paddingAngle={4} dataKey="value">
                   {dataCategories.map((_: { name: string; value: number }, i: number) => <Cell key={i} fill={COLORS[i]} />)}
                 </Pie>
                 <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #ede6d6', fontSize: '13px' }} />
@@ -324,74 +324,62 @@ export default function AdminDashboard() {
             </ResponsiveContainer>
           </div>
         </AnimateIn>
-      </div >
+      </div>
 
-      <AnimateIn delay={0.25}>
-        <div className="bg-white rounded-3xl border border-creme-dark overflow-hidden mb-4 md:mb-6">
-          <div className="px-4 md:px-6 py-4 md:py-5 border-b border-creme-dark">
-            <h2 className="font-display text-lg md:text-xl text-vert">Commandes récentes</h2>
-          </div>
-          <div className="divide-y divide-creme-dark">
-            {recentOrders?.map((cmd: OrderSummary) => (
-              <div key={cmd.id} className="px-4 md:px-6 py-3 md:py-4 flex items-center justify-between gap-3">
-                <div>
-                  <p className="font-mono text-[12px] md:text-[13px] font-medium text-vert">{cmd.id.slice(0, 8)}...</p>
-                  <p className="text-[11px] md:text-[12px] text-gris mt-0.5">{new Date(cmd.createdAt).toLocaleDateString('fr-FR')}</p>
-                </div>
-                <div className="flex items-center gap-2 md:gap-6">
-                  <span className={`text-[10px] md:text-[11px] font-semibold px-2 md:px-3 py-1 rounded-full ${
-                    cmd.status === 'annulee' ? 'bg-red-50 text-red-500' :
-                    cmd.status === 'terminee' ? 'bg-green-50 text-green-600' : 'bg-blue-50 text-blue-500'
-                  }`}>
-                    {cmd.status === 'annulee' ? 'Annulée' : cmd.status === 'terminee' ? 'Terminée' : 'En cours'}
-                  </span>
-                  <span className={`text-[10px] md:text-[11px] font-semibold px-2 md:px-3 py-1 rounded-full hidden sm:block ${
-                    cmd.paymentStatus === 'payee' ? 'bg-green-50 text-green-600' : 'bg-orange-50 text-orange-500'
-                  }`}>
-                    {cmd.paymentStatus === 'payee' ? 'Payée' : 'En attente'}
-                  </span>
-                  <span className="font-display text-[14px] md:text-[15px] text-vert">
-                    {cmd.total.toFixed(2)}€
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </AnimateIn>
-
-      <AnimateIn delay={0.3}>
-        <div className="bg-white rounded-3xl border border-creme-dark overflow-hidden">
-          <div className="px-4 md:px-6 py-4 md:py-5 border-b border-creme-dark">
-            <h2 className="font-display text-lg md:text-xl text-vert">Meilleurs clients</h2>
-          </div>
-          <div className="divide-y divide-creme-dark">
-            {topClients?.map((c: ClientSummary) => (
-              <div key={c.id} className="px-4 md:px-6 py-3 md:py-4 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-creme flex items-center justify-center text-matcha font-semibold text-[12px] md:text-[13px] shrink-0">
-                    {c.name ? c.name[0] : '?'}
-                  </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+        <AnimateIn delay={0.25}>
+          <div className="bg-white rounded-2xl border border-creme-dark overflow-hidden max-h-[340px] flex flex-col">
+            <div className="px-4 py-3 border-b border-creme-dark shrink-0">
+              <h2 className="font-display text-base text-vert">Commandes récentes</h2>
+            </div>
+            <div className="divide-y divide-creme-dark overflow-y-auto flex-1">
+              {recentOrders?.slice(0, 6).map((cmd: OrderSummary) => (
+                <div key={cmd.id} className="px-4 py-2.5 flex items-center justify-between gap-2">
                   <div>
-                    <p className="text-[12px] md:text-[13px] font-medium text-texte">{c.name || 'Utilisateur'}</p>
-                    <p className="text-[11px] md:text-[12px] text-gris hidden sm:block">{c.email}</p>
+                    <p className="font-mono text-[11px] font-medium text-vert">{cmd.id.slice(0, 8)}...</p>
+                    <p className="text-[10px] text-gris">{new Date(cmd.createdAt).toLocaleDateString('fr-FR')}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full ${
+                      cmd.status === 'annulee' ? 'bg-red-50 text-red-500' :
+                      cmd.status === 'terminee' ? 'bg-green-50 text-green-600' : 'bg-blue-50 text-blue-500'
+                    }`}>
+                      {cmd.status === 'annulee' ? 'Ann.' : cmd.status === 'terminee' ? 'Term.' : 'Enc.'}
+                    </span>
+                    <span className="font-display text-[13px] text-vert">
+                      {cmd.total.toFixed(2)}€
+                    </span>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 md:gap-8">
-                  <div className="text-center hidden sm:block">
-                    <p className="text-[11px] text-gris uppercase tracking-wider">Commandes</p>
-                    <p className="font-display text-base md:text-lg text-vert">{c._count.orders}</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-[11px] text-gris uppercase tracking-wider hidden sm:block">Total</p>
-                    <p className="font-display text-base md:text-lg text-vert">{c.totalSpent?.toFixed(2) || '0.00'}€</p>
-                  </div>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </AnimateIn>
+        </AnimateIn>
+
+        <AnimateIn delay={0.3}>
+          <div className="bg-white rounded-2xl border border-creme-dark overflow-hidden max-h-[340px] flex flex-col">
+            <div className="px-4 py-3 border-b border-creme-dark shrink-0">
+              <h2 className="font-display text-base text-vert">Meilleurs clients</h2>
+            </div>
+            <div className="divide-y divide-creme-dark overflow-y-auto flex-1">
+              {topClients?.slice(0, 6).map((c: ClientSummary) => (
+                <div key={c.id} className="px-4 py-2.5 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-creme flex items-center justify-center text-matcha font-semibold text-[11px] shrink-0">
+                      {c.name ? c.name[0] : '?'}
+                    </div>
+                    <p className="text-[11px] md:text-[12px] font-medium text-texte truncate max-w-[100px]">{c.name || 'Utilisateur'}</p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className="text-[11px] text-gris hidden sm:block">{c._count.orders} cmd</span>
+                    <span className="font-display text-[13px] text-vert">{c.totalSpent?.toFixed(2) || '0.00'}€</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </AnimateIn>
+      </div>
     </div>
   )
 }

@@ -129,22 +129,22 @@ export default function Livraison() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
             {/* Zones */}
-            <AnimateIn delay={0.1} className="md:col-span-2 mb-8 md:mb-30">
-              <div className="bg-white rounded-3xl border border-creme-dark p-5 md:p-6 pb-10 md:pb-12 relative z-20 overflow-visible">
-                <div className="flex items-center gap-3 mb-5 md:mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-creme flex items-center justify-center text-matcha">
-                    <MapPin size={18} />
+            <AnimateIn delay={0.1} className="lg:col-span-2 mb-4">
+              <div className="bg-white rounded-2xl border border-creme-dark p-4 md:p-5">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-9 h-9 rounded-lg bg-creme flex items-center justify-center text-matcha">
+                    <MapPin size={16} />
                   </div>
-                  <h2 className="font-display text-lg md:text-xl text-vert">
+                  <h2 className="font-display text-base md:text-lg text-vert">
                     Zones de livraison
                   </h2>
                 </div>
 
-                <div className="flex flex-col gap-6">
-                  <div className="relative max-w-md">
-                    <label className="text-[12px] font-medium text-gris uppercase tracking-wider mb-2 block">
+                <div className="flex flex-col gap-3">
+                  <div className="relative max-w-sm">
+                    <label className="text-[11px] font-medium text-gris uppercase tracking-wider mb-1.5 block">
                       Ajouter une ville
                     </label>
                     <div className="relative">
@@ -155,16 +155,16 @@ export default function Livraison() {
                         onFocus={() =>
                           cityQuery.length >= 2 && setShowSuggestions(true)
                         }
-                        placeholder="Ex: Biarritz, Bayonne..."
-                        className="input-field w-full"
+                        placeholder="Ex: Biarritz..."
+                        className="input-field w-full text-[12px]"
                       />
                       {showSuggestions && citySuggestions.length > 0 && (
-                        <ul className="absolute z-[100] w-full mt-1 bg-white border border-creme-dark rounded-xl shadow-2xl max-h-60 overflow-auto py-2 block">
+                        <ul className="absolute z-[100] w-full mt-1 bg-white border border-creme-dark rounded-xl shadow-2xl max-h-48 overflow-auto py-1 block">
                           {citySuggestions.map((city) => (
                             <li
                               key={city}
                               onClick={() => addZone(city)}
-                              className="px-4 py-2 hover:bg-creme cursor-pointer text-sm text-gris hover:text-vert transition-colors block"
+                              className="px-3 py-1.5 hover:bg-creme cursor-pointer text-sm text-gris hover:text-vert transition-colors block"
                             >
                               {city}
                             </li>
@@ -178,7 +178,7 @@ export default function Livraison() {
                     {settings.zonesActives.map((zone) => (
                       <span
                         key={zone}
-                        className="px-4 py-2 rounded-full text-[12px] md:text-[13px] font-medium bg-matcha text-white border border-matcha flex items-center gap-2 animate-in fade-in zoom-in duration-200"
+                        className="px-3 py-1 rounded-full text-[11px] font-medium bg-matcha text-white border border-matcha flex items-center gap-1.5"
                       >
                         {zone}
                         <button
@@ -190,7 +190,7 @@ export default function Livraison() {
                       </span>
                     ))}
                     {settings.zonesActives.length === 0 && (
-                      <p className="text-gris text-sm italic">
+                      <p className="text-gris text-xs italic">
                         Aucune zone de livraison définie.
                       </p>
                     )}
@@ -200,20 +200,20 @@ export default function Livraison() {
             </AnimateIn>
 
             {/* Horaires */}
-            <AnimateIn delay={0.2}>
-              <div className="bg-white rounded-3xl border border-creme-dark p-5 md:p-6">
-                <div className="flex items-center gap-3 mb-5 md:mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-creme flex items-center justify-center text-matcha">
-                    <Clock size={18} />
+            <AnimateIn delay={0.15}>
+              <div className="bg-white rounded-2xl border border-creme-dark p-4 md:p-5">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-9 h-9 rounded-lg bg-creme flex items-center justify-center text-matcha">
+                    <Clock size={16} />
                   </div>
-                  <h2 className="font-display text-lg md:text-xl text-vert">
+                  <h2 className="font-display text-base text-vert">
                     Horaires
                   </h2>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <div>
-                    <label className="text-[12px] font-medium text-gris uppercase tracking-wider mb-2 block">
-                      Heure limite de commande
+                    <label className="text-[11px] font-medium text-gris uppercase tracking-wider mb-1.5 block">
+                      Heure limite
                     </label>
                     <input
                       type="time"
@@ -225,8 +225,8 @@ export default function Livraison() {
                     />
                   </div>
                   <div>
-                    <label className="text-[12px] font-medium text-gris uppercase tracking-wider mb-2 block">
-                      Heure de livraison
+                    <label className="text-[11px] font-medium text-gris uppercase tracking-wider mb-1.5 block">
+                      Heure livraison
                     </label>
                     <input
                       type="time"
@@ -245,20 +245,20 @@ export default function Livraison() {
             </AnimateIn>
 
             {/* Tarifs */}
-            <AnimateIn delay={0.3}>
-              <div className="bg-white rounded-3xl border border-creme-dark p-5 md:p-6">
-                <div className="flex items-center gap-3 mb-5 md:mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-creme flex items-center justify-center text-matcha">
-                    <Truck size={18} />
+            <AnimateIn delay={0.2}>
+              <div className="bg-white rounded-2xl border border-creme-dark p-4 md:p-5">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-9 h-9 rounded-lg bg-creme flex items-center justify-center text-matcha">
+                    <Truck size={16} />
                   </div>
-                  <h2 className="font-display text-lg md:text-xl text-vert">
+                  <h2 className="font-display text-base text-vert">
                     Tarifs
                   </h2>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <div>
-                    <label className="text-[12px] font-medium text-gris uppercase tracking-wider mb-2 block">
-                      Frais de livraison (€)
+                    <label className="text-[11px] font-medium text-gris uppercase tracking-wider mb-1.5 block">
+                      Frais livraison (€)
                     </label>
                     <input
                       type="number"
@@ -274,8 +274,8 @@ export default function Livraison() {
                     />
                   </div>
                   <div>
-                    <label className="text-[12px] font-medium text-gris uppercase tracking-wider mb-2 block">
-                      Minimum de commande (€)
+                    <label className="text-[11px] font-medium text-gris uppercase tracking-wider mb-1.5 block">
+                      Minimum commande (€)
                     </label>
                     <input
                       type="number"
@@ -297,14 +297,14 @@ export default function Livraison() {
 
           {/* Sauvegarder */}
           <AnimateIn delay={0.25}>
-            <div className="flex justify-end mt-6">
+            <div className="flex justify-end mt-4">
               <Button
                 onClick={handleSave}
-                className="flex items-center gap-2 w-full sm:w-auto justify-center"
+                className="flex items-center gap-2 px-5 py-2.5"
                 disabled={isSaving}
               >
-                <Save size={16} />
-                {isSaving ? "Sauvegarde..." : "Sauvegarder les paramètres"}
+                <Save size={15} />
+                {isSaving ? "Sauvegarde..." : "Sauvegarder"}
               </Button>
             </div>
           </AnimateIn>

@@ -134,38 +134,52 @@ export default function Promotions() {
     }
   }
 
+  useEffect(() => {
+    if (isModalOpen || isCodeModalOpen) {
+      if (window.__lenisInstance?.stop) {
+        window.__lenisInstance.stop()
+      }
+
+      return () => {
+        if (window.__lenisInstance?.start) {
+          window.__lenisInstance.start()
+        }
+      }
+    }
+  }, [isModalOpen, isCodeModalOpen])
+
   return (
     <div>
       <AnimateIn>
         <p className="section-eyebrow mb-2">Admin</p>
-        <h1 className="font-display text-3xl md:text-4xl text-vert mb-8 md:mb-10">Promotions</h1>
+        <h1 className="font-display text-2xl md:text-3xl text-vert mb-6">Promotions</h1>
       </AnimateIn>
 
       {/* Banniere */}
       <AnimateIn delay={0.05}>
-        <div className="bg-white rounded-3xl border border-creme-dark p-5 md:p-6 mb-8 md:mb-10">
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="font-display text-lg md:text-xl text-vert">Banniere promotionnelle</h2>
+        <div className="bg-white rounded-2xl border border-creme-dark p-4 md:p-5 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-display text-base md:text-lg text-vert">Banniere promotionnelle</h2>
             <div className="flex items-center gap-3">
-              <span className="text-[13px] text-gris hidden sm:block">
+              <span className="text-[11px] text-gris hidden sm:block">
                 {banniere.actif ? 'Active' : 'Inactive'}
               </span>
               <button
                 onClick={() => setBanniere({ ...banniere, actif: !banniere.actif })}
-                className={`relative w-12 h-6 rounded-full transition-all ${
+                className={`relative w-11 h-5.5 rounded-full transition-all ${
                   banniere.actif ? 'bg-matcha' : 'bg-creme-dark'
                 }`}
               >
-                <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-all ${
-                  banniere.actif ? 'left-7' : 'left-1'
+                <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${
+                  banniere.actif ? 'left-6' : 'left-0.5'
                 }`} />
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="sm:col-span-2">
-              <label className="text-[12px] font-medium text-gris uppercase tracking-wider mb-2 block">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="text-[11px] font-medium text-gris uppercase tracking-wider mb-1.5 block">
                 Texte
               </label>
               <input
@@ -175,8 +189,8 @@ export default function Promotions() {
                 className="input-field"
               />
             </div>
-            <div className="sm:col-span-2">
-              <label className="text-[12px] font-medium text-gris uppercase tracking-wider mb-2 block">
+            <div>
+              <label className="text-[11px] font-medium text-gris uppercase tracking-wider mb-1.5 block">
                 Emoji
               </label>
               <input
@@ -187,7 +201,7 @@ export default function Promotions() {
               />
             </div>
             <div className="sm:col-span-2">
-              <label className="text-[12px] font-medium text-gris uppercase tracking-wider mb-2 block">
+              <label className="text-[11px] font-medium text-gris uppercase tracking-wider mb-1.5 block">
                 Couleur
               </label>
               <div className="flex gap-2">
@@ -195,7 +209,7 @@ export default function Promotions() {
                   <button
                     key={c}
                     onClick={() => setBanniere({ ...banniere, couleur: c })}
-                    className={`flex-1 py-2 rounded-xl text-[12px] font-medium border-2 transition-all ${
+                    className={`flex-1 py-1.5 rounded-lg text-[11px] font-medium border-2 transition-all ${
                       banniere.couleur === c ? 'border-vert scale-[1.02]' : 'border-transparent'
                     } ${
                       c === 'vert'   ? 'bg-vert text-white'   :
@@ -210,9 +224,9 @@ export default function Promotions() {
             </div>
           </div>
 
-          <div className="mt-6 p-4 bg-creme/50 rounded-2xl border border-creme-dark">
-            <p className="text-[12px] font-medium text-gris uppercase tracking-wider mb-3">Aperçu et enregistrement</p>
-            <div className={`rounded-2xl px-4 py-3 flex items-center justify-center gap-3 text-[13px] font-medium mb-4 ${
+          <div className="mt-4 p-3 bg-creme/50 rounded-xl border border-creme-dark">
+            <p className="text-[11px] font-medium text-gris uppercase tracking-wider mb-2">Aperçu</p>
+            <div className={`rounded-xl px-3 py-2 flex items-center justify-center gap-2 text-[12px] font-medium mb-3 ${
               banniere.couleur === 'matcha' ? 'bg-matcha text-white' :
               banniere.couleur === 'or'     ? 'bg-or text-vert'      :
               'bg-vert text-white'
@@ -232,9 +246,9 @@ export default function Promotions() {
                   await fetchAll()
                 }
               }}
-              className="w-full py-2.5 rounded-xl bg-vert text-white text-[13px] font-semibold hover:bg-vert-mid transition-colors"
+              className="w-full py-2 rounded-lg bg-vert text-white text-[12px] font-semibold hover:bg-vert-mid transition-colors"
             >
-              Enregistrer la bannière
+              Enregistrer
             </button>
           </div>
         </div>
@@ -242,31 +256,31 @@ export default function Promotions() {
 
       {/* Bouton ajouter */}
       <AnimateIn delay={0.1}>
-        <div className="flex justify-end mb-6">
+        <div className="flex justify-end mb-4">
           <button
             onClick={() => { setEditingPromo(null); setIsModalOpen(true); }}
-            className="btn-primary flex items-center gap-2"
+            className="btn-primary text-[12px] px-4 py-2 flex items-center gap-2"
           >
-            <Plus size={15} />
-            Nouvelle promotion
+            <Plus size={14} />
+            Promotion
           </button>
         </div>
       </AnimateIn>
 
       {/* Liste promos */}
-      <div className="space-y-3 md:space-y-4 mb-8 md:mb-10">
+      <div className="space-y-2 mb-6">
         {isLoading ? (
-          <div className="flex justify-center py-10"><Loader2 className="animate-spin text-vert" /></div>
+          <div className="flex justify-center py-8"><Loader2 className="animate-spin text-vert" /></div>
         ) : (
-          promos.map((promo, i) => {
+          promos.slice(0, 5).map((promo, i) => {
             const produit = produits.find((p) => p.id === promo.productId)
             if (!produit) return null
             return (
-              <AnimateIn key={promo.id} delay={i * 0.1}>
-                <div className="bg-white rounded-3xl border border-creme-dark p-4 md:p-6 flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-3 md:gap-4">
+              <AnimateIn key={promo.id} delay={i * 0.05}>
+                <div className="bg-white rounded-xl border border-creme-dark p-3 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
                     <div
-                      className="w-10 h-10 md:w-12 md:h-12 rounded-2xl flex items-center justify-center shrink-0 overflow-hidden"
+                      className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 overflow-hidden"
                       style={{ backgroundColor: '#f5f5f5' }}
                     >
                       <img
@@ -277,43 +291,28 @@ export default function Promotions() {
                       />
                     </div>
                     <div>
-                      <p className="font-medium text-vert text-[14px] md:text-[15px]">{produit.name}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="bg-matcha text-white text-[10px] md:text-[11px] font-bold px-2 py-0.5 rounded-full">
+                      <p className="font-medium text-vert text-[13px]">{produit.name}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="bg-matcha text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">
                           {promo.label}
                         </span>
-                        <span className="text-[11px] md:text-[12px] text-gris hidden sm:block">
+                        <span className="text-[10px] text-gris">
                           {promo.discountPercent}% de reduction
                         </span>
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 md:gap-4 shrink-0">
-                    <button
-                      onClick={() => { setEditingPromo(promo); setIsModalOpen(true); }}
-                      className="hidden sm:flex items-center gap-1.5 text-[12px] text-matcha hover:text-vert transition-colors"
-                    >
-                      <Pencil size={13} /> Modifier
-                    </button>
-                    <button
-                      onClick={() => deletePromo(promo.id)}
-                      className="hidden sm:flex items-center gap-1.5 text-[12px] text-red-400 hover:text-red-600 transition-colors"
-                    >
-                      <X size={13} /> Supprimer
-                    </button>
+                  <div className="flex items-center gap-2 shrink-0">
                     <button
                       onClick={() => togglePromo(promo.id, promo.isActive)}
-                      className={`relative w-12 h-6 rounded-full transition-all ${
+                      className={`relative w-10 h-5 rounded-full transition-all ${
                         promo.isActive ? 'bg-matcha' : 'bg-creme-dark'
                       }`}
                     >
-                      <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-all ${
-                        promo.isActive ? 'left-7' : 'left-1'
+                      <span className={`absolute top-0.5 w-3.5 h-3.5 rounded-full bg-white shadow transition-all ${
+                        promo.isActive ? 'left-5.5' : 'left-0.5'
                       }`} />
                     </button>
-                    <span className="text-[12px] text-gris w-14 hidden sm:block">
-                      {promo.isActive ? 'Active' : 'Inactive'}
-                    </span>
                   </div>
                 </div>
               </AnimateIn>
@@ -323,60 +322,49 @@ export default function Promotions() {
       </div>
 
       {/* Codes promos */}
-      <AnimateIn delay={0.3}>
-        <div className="bg-white rounded-3xl border border-creme-dark overflow-hidden">
-          <div className="px-4 md:px-6 py-4 md:py-5 border-b border-creme-dark flex items-center justify-between">
-            <h2 className="font-display text-lg md:text-xl text-vert">Codes promo</h2>
-            <div className="flex gap-2">
-               <button
-                onClick={() => setIsCodeModalOpen(true)}
-                className="btn-primary text-[12px] px-3 md:px-4 py-2 flex items-center gap-1.5"
-              >
-                <Plus size={13} /> Nouveau code
-              </button>
-            </div>
+      <AnimateIn delay={0.2}>
+        <div className="bg-white rounded-2xl border border-creme-dark overflow-hidden">
+          <div className="px-4 py-3 border-b border-creme-dark flex items-center justify-between">
+            <h2 className="font-display text-base text-vert">Codes promo</h2>
+            <button
+              onClick={() => setIsCodeModalOpen(true)}
+              className="btn-primary text-[11px] px-3 py-1.5 flex items-center gap-1.5"
+            >
+              <Plus size={12} /> Code
+            </button>
           </div>
-          <div className="p-4 md:p-6 space-y-4">
+          <div className="p-3 space-y-2 max-h-[240px] overflow-y-auto">
             {isLoading ? (
-              <div className="flex justify-center py-10"><Loader2 className="animate-spin text-vert" /></div>
+              <div className="flex justify-center py-6"><Loader2 className="animate-spin text-vert" /></div>
             ) : (
               codes.map((code) => (
-                <div key={code.id} className="bg-white rounded-2xl border border-creme-dark p-4 flex items-center justify-between gap-4 hover:border-matcha transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-creme flex items-center justify-center text-matcha border border-creme-dark shrink-0">
-                      <Tag size={18} />
+                <div key={code.id} className="bg-creme/30 rounded-xl border border-creme-dark p-3 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-creme flex items-center justify-center text-matcha border border-creme-dark shrink-0">
+                      <Tag size={14} />
                     </div>
                     <div>
-                      <div className="flex items-center gap-2">
-                        <p className="font-display font-bold text-vert text-lg font-mono">{code.code}</p>
-                        <span className="bg-matcha text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                      <div className="flex items-center gap-1.5">
+                        <p className="font-display font-bold text-vert text-sm font-mono">{code.code}</p>
+                        <span className="bg-matcha text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">
                           -{code.discountPercent}%
                         </span>
                       </div>
-                      <p className="text-[12px] text-gris mt-1">
-                        {code.currentUsage} utilisations • {code.isActive ? 'Actif' : 'Expiré'}
+                      <p className="text-[10px] text-gris">
+                        {code.currentUsage} utilisations
                       </p>
-                      {code.startDate || code.endDate ? (
-                        <p className="text-[11px] text-gris italic mt-1">
-                          Valable du {code.startDate ? new Date(code.startDate).toLocaleDateString() : '...'} au {code.endDate ? new Date(code.endDate).toLocaleDateString() : '...'}
-                        </p>
-                      ) : (
-                        <p className="text-[11px] text-gris italic mt-1">Pas de date limite définie</p>
-                      )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={async () => {
-                        await fetch(`/api/admin/promo-codes/${code.id}`, { method: 'DELETE' })
-                        fetchAll()
-                      }}
-                      className="p-2 text-red-400 hover:text-red-600 transition-colors"
-                      title="Supprimer"
-                    >
-                      <X size={18} />
-                    </button>
-                  </div>
+                  <button
+                    onClick={async () => {
+                      await fetch(`/api/admin/promo-codes/${code.id}`, { method: 'DELETE' })
+                      fetchAll()
+                    }}
+                    className="p-1.5 text-red-400 hover:text-red-600 transition-colors"
+                    title="Supprimer"
+                  >
+                    <X size={14} />
+                  </button>
                 </div>
               ))
             )}
@@ -387,7 +375,7 @@ export default function Promotions() {
       {/* Modal Promotion */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-blanc/50 backdrop-blur-sm p-4">
-          <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-creme-dark overflow-hidden">
+          <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-creme-dark">
             <div className="px-6 py-4 border-b border-creme-dark flex items-center justify-between bg-creme/30">
               <h2 className="font-display text-xl text-vert">
                 {editingPromo ? 'Modifier la promotion' : 'Nouvelle promotion'}
@@ -443,7 +431,7 @@ export default function Promotions() {
       {/* Modal Code Promo */}
       {isCodeModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-blanc/50 backdrop-blur-sm p-4">
-          <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-creme-dark overflow-hidden">
+          <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-creme-dark">
             <div className="px-6 py-4 border-b border-creme-dark flex items-center justify-between bg-creme/30">
               <h2 className="font-display text-xl text-vert">Nouveau code promo</h2>
               <button onClick={() => setIsCodeModalOpen(false)} className="text-gris hover:text-vert transition-colors">
