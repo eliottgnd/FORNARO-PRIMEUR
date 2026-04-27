@@ -137,17 +137,21 @@ export default function Favoris() {
                       className="aspect-square flex items-center justify-center relative overflow-hidden"
                       style={{ backgroundColor: '#f5f5f5' }}
                     >
-                      {product.image ? (
+                      {(() => {
+                      const imgSrc = getProductImage(product)
+                      const isPlaceholder = imgSrc === '/placeholder.webp'
+                      return isPlaceholder ? (
+                        <span className="text-4xl md:text-5xl">🍃</span>
+                      ) : (
                         <Image
-                          src={getProductImage(product)}
+                          src={imgSrc}
                           alt={product.name}
                           fill
                           className="object-cover transition-transform group-hover:scale-110 duration-300"
                           sizes="(max-width: 768px) 50vw, 25vw"
                         />
-                      ) : (
-                        <span className="text-4xl md:text-5xl">🍃</span>
-                      )}
+                      )
+                    })()}
                     </div>
                     <div className="p-3 md:p-4">
                       <p className="text-[13px] md:text-[14px] font-medium text-texte line-clamp-1">{product.name}</p>
