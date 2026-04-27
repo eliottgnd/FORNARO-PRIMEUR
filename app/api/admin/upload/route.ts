@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { writeFile } from "node:fs/promises";
-import path from "node:path";
-import crypto from "node:crypto";
+import cloudinary from "@/lib/cloudinary";
 
 async function checkAdmin() {
   const session = await getServerSession(authOptions);
@@ -38,13 +36,15 @@ export async function POST(req: Request) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const extension = path.extname(file.name) || ".webp";
-    const filename = `${crypto.randomUUID()}${extension}`;
-    const publicPath = path.join(process.cwd(), "public", filename);
+    const base64 = buffer.toString("base64");
+    const dataUri = `data:image/webp;base64,${base64}`;
 
-    await writeFile(publicPath, buffer);
+    const result = await cloudinary.uploader.upload(dataUri, {
+      folder: "fornaro",
+      resource_type: "image",
+    });
 
-    return NextResponse.json({ filename }, { status: 200 });
+    return NextResponse.json({ filename: result.secure_url }, { status: 200 });
   } catch (error) {
     console.error("UPLOAD_ERROR:", error);
     return NextResponse.json({ message: "Internal server error" }, { status: 500 });

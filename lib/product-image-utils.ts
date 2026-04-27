@@ -67,12 +67,17 @@ const translationMap: Record<string, string> = {
 };
 
 export function getProductImage(product: any) {
-  // 1. Explicit image from database
+  // 1. Cloudinary or external URL (already full URL)
+  if (product.image && (product.image.startsWith('http://') || product.image.startsWith('https://'))) {
+    return product.image
+  }
+
+  // 2. Explicit image from database (local file)
   if (product.image) {
     return `/${product.image.endsWith('.webp') || product.image.endsWith('.png') || product.image.endsWith('.jpg') || product.image.endsWith('.jpeg') ? product.image : product.image + '.webp'}`
   }
 
-  // 2. Translation match
+  // 3. Translation match
   const name = product.name.toLowerCase()
   const translated = Object.entries(translationMap).find(([fr, en]) =>
     name.includes(fr.toLowerCase())
@@ -82,7 +87,7 @@ export function getProductImage(product: any) {
     return `/${translated[1]}.webp`
   }
 
-  // 3. Direct English match (slugified)
+  // 4. Direct English match (slugified)
   const slug = product.name
     .toLowerCase()
     .trim()

@@ -553,7 +553,7 @@ export default function Stocks() {
                       </div>
                     ) : currentImage || editingProduct?.image ? (
                       <img
-                        src={`/${currentImage || editingProduct?.image}`}
+                        src={currentImage || editingProduct?.image}
                         alt="Preview"
                         className="w-full h-full object-cover rounded-2xl"
                       />
