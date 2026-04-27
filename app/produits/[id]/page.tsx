@@ -178,17 +178,21 @@ export default function FicheProduit() {
             className="rounded-3xl aspect-square flex items-center justify-center text-[120px] md:text-[180px] relative overflow-hidden"
             style={{ backgroundColor: '#f5f5f5' }}
           >
-            {produit.image ? (
-              <Image
-                src={getProductImage(produit)}
-                alt={produit.name}
-                fill
-                className="object-cover"
-                priority
-              />
-            ) : (
-              <span className="select-none text-6xl">🍃</span>
-            )}
+            {(() => {
+              const imgSrc = getProductImage(produit)
+              const isPlaceholder = imgSrc === '/placeholder.webp'
+              return isPlaceholder ? (
+                <span className="select-none text-6xl">🍃</span>
+              ) : (
+                <Image
+                  src={imgSrc}
+                  alt={produit.name}
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              )
+            })()}
             {produit.badge && (
               <span className="absolute top-4 right-4 md:top-5 md:right-5">
                 <Badge label={produit.badge} variant="vert" />
@@ -324,17 +328,21 @@ export default function FicheProduit() {
                       className="aspect-square flex items-center justify-center relative overflow-hidden"
                       style={{ backgroundColor: '#f5f5f5' }}
                     >
-                      {p.image ? (
-                        <Image
-                          src={getProductImage(p)}
-                          alt={p.name}
-                          fill
-                          className="object-cover transition-transform group-hover:scale-110 duration-300"
-                          sizes="(max-width: 768px) 50vw, 25vw"
-                        />
-                      ) : (
-                        <span className="text-4xl md:text-5xl">🍃</span>
-                      )}
+                      {(() => {
+                        const imgSrc = getProductImage(p)
+                        const isPlaceholder = imgSrc === '/placeholder.webp'
+                        return isPlaceholder ? (
+                          <span className="text-4xl md:text-5xl">🍃</span>
+                        ) : (
+                          <Image
+                            src={imgSrc}
+                            alt={p.name}
+                            fill
+                            className="object-cover transition-transform group-hover:scale-110 duration-300"
+                            sizes="(max-width: 768px) 50vw, 25vw"
+                          />
+                        )
+                      })()}
                       {p.badge && (
                         <span className="absolute top-2 right-2 md:top-3 md:right-3 z-10">
                           <Badge label={p.badge} variant="vert" />

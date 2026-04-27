@@ -50,3 +50,20 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }
+
+export async function DELETE() {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+  }
+
+  try {
+    await prisma.user.delete({
+      where: { id: session.user.id },
+    })
+    return NextResponse.json({ message: 'Compte supprimé' })
+  } catch (e: any) {
+    console.error('Delete user error:', e)
+    return NextResponse.json({ error: 'Erreur serveur', details: e.message }, { status: 500 })
+  }
+}

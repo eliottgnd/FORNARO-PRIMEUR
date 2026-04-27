@@ -121,11 +121,14 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
         throw new Error(data.message || "Erreur lors de l'envoi du code");
       }
 
-      setSuccessMessage(
-        view === "signup"
-          ? "Un code de vérification a été envoyé à votre email"
-          : "Un code de réinitialisation a été envoyé à votre email"
-      );
+      if (view === "forgot") {
+        setSuccessMessage("Un code de réinitialisation a été envoyé à votre email");
+        setView("reset");
+      } else {
+        setSuccessMessage(
+          "Un code de vérification a été envoyé à votre email"
+        );
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -259,6 +262,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
       setSuccessMessage("Mot de passe réinitialisé avec succès");
       setTimeout(() => {
         setView("login");
+        setSuccessMessage(null);
         setFormData((prev) => ({
           ...prev,
           password: "",
@@ -431,7 +435,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
           </div>
         )}
 
-        {/* SIGNUP FORM - 2 steps */}
+        {/* SIGNUP STEP 1: Form + send code */}
         {view === "signup" && !successMessage && (
           <div>
             {/* Header */}
@@ -549,8 +553,8 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
           </div>
         )}
 
-        {/* Success state after code sent for signup */}
-        {view === "signup" && successMessage && !formData.code && (
+        {/* SIGNUP STEP 2: Code entry after email confirmation sent */}
+        {view === "signup" && successMessage && (
           <div>
             {/* Header */}
             <div className="text-center mb-6">

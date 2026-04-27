@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { AnimateIn } from '@/components/layout/AnimateIn'
 import { useSession } from 'next-auth/react'
+import { signOut } from 'next-auth/react'
 
 export default function Infos() {
   const { data: session } = useSession()
@@ -12,6 +13,9 @@ export default function Infos() {
   })
   const [isLoading, setIsLoading] = useState(true)
   const [sauvegarde, setSauvegarde] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deleteLoading, setDeleteLoading] = useState(false)
+  const [deleteSuccess, setDeleteSuccess] = useState(false)
 
   useEffect(() => {
     async function fetchProfile() {
@@ -53,6 +57,23 @@ export default function Infos() {
       console.error("Failed to save profile:", e)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleDeleteAccount = async () => {
+    setDeleteLoading(true)
+    try {
+      const res = await fetch('/api/user/profile', {
+        method: 'DELETE',
+      })
+      if (res.ok) {
+        setDeleteSuccess(true)
+        setTimeout(() => signOut({ callbackUrl: '/' }), 1500)
+      }
+    } catch (e) {
+      console.error("Failed to delete account:", e)
+    } finally {
+      setDeleteLoading(false)
     }
   }
 
@@ -111,6 +132,41 @@ export default function Infos() {
               >
                 {sauvegarde ? '✓ Sauvegardé !' : 'Sauvegarder les modifications'}
               </button>
+            </div>
+
+            {/* Supprimer le compte */}
+            <div className="pt-6 mt-6 border-t border-creme-dark">
+              <h3 className="text-[13px] font-medium text-red-600 mb-2">Zone dangereuse</h3>
+              <p className="text-[11px] text-gris mb-4">
+                La suppression de votre compte est irréversible. Toutes vos données seront définitivement supprimées.
+              </p>
+              {!showDeleteConfirm ? (
+                <button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="text-[12px] text-red-500 border border-red-500 rounded-full px-4 py-2 hover:bg-red-50 transition-colors"
+                >
+                  Supprimer mon compte
+                </button>
+              ) : (
+                <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                  <p className="text-[12px] text-red-700 mb-3 font-medium">Êtes-vous sûr ? Cette action est irréversible.</p>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={handleDeleteAccount}
+                      disabled={deleteLoading}
+                      className="text-[12px] bg-red-600 text-white rounded-full px-4 py-2 hover:bg-red-700 transition-colors disabled:opacity-50"
+                    >
+                      {deleteLoading ? 'Suppression...' : deleteSuccess ? '✓ Supprimé' : 'Oui, supprimer'}
+                    </button>
+                    <button
+                      onClick={() => setShowDeleteConfirm(false)}
+                      className="text-[12px] text-gris border border-creme-dark rounded-full px-4 py-2 hover:bg-creme transition-colors"
+                    >
+                      Annuler
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
           </div>
