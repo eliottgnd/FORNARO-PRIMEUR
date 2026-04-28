@@ -18,7 +18,7 @@ interface CartItem {
 
 interface CartState {
   items: CartItem[]
-  addItem: (product: any) => { added: boolean; alreadyExists: boolean }
+  addItem: (product: any, quantity?: number) => { added: boolean; alreadyExists: boolean }
   removeItem: (productId: string) => void
   updateQuantity: (productId: string, quantity: number) => void
   clearCart: () => void
@@ -31,7 +31,7 @@ export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
-      addItem: (product) => {
+      addItem: (product, quantity = 0.5) => {
         const currentItems = get().items
         const existingItem = currentItems.find((item) => item.productId === product.id)
 
@@ -49,7 +49,7 @@ export const useCartStore = create<CartState>()(
                 price: discountedPrice,
                 originalPrice: hasPromotion ? originalPrice : undefined,
                 discountPercent: hasPromotion ? discountPercent : undefined,
-                quantity: 0.5,
+                quantity,
                 unit: product.unit || product.unite,
                 imageUrl: getProductImage(product),
                 availabilities: Array.isArray(product.availabilities)

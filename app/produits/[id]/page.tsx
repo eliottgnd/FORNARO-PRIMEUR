@@ -34,7 +34,7 @@ export default function FicheProduit() {
   const [produit, setProduit] = useState<Product | null>(null)
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [quantite, setQuantite] = useState(1)
+  const [quantite, setQuantite] = useState(0.5)
   const [ajoute, setAjoute] = useState(false)
   const [isFavorited, setIsFavorited] = useState(false)
   const [isTogglingFavorite, setIsTogglingFavorite] = useState(false)
@@ -112,7 +112,7 @@ export default function FicheProduit() {
       categorie: produit.category,
       promotions: produit.promotions || [],
     }
-    const result = addItem(productForCart)
+    const result = addItem(productForCart, quantite)
     if (result.alreadyExists) {
       showToast('Produit déjà ajouté au panier', 'info')
     } else {
@@ -369,7 +369,7 @@ export default function FicheProduit() {
                             categorie: p.category,
                             promotions: p.promotions || [],
                           }
-                          const result = addItem(productForCart)
+                          const result = addItem(productForCart, 1)
                           if (result.alreadyExists) {
                             showToast('Produit déjà ajouté au panier', 'info')
                           } else {
