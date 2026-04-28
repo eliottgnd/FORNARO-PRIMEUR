@@ -580,32 +580,31 @@ export default function Stocks() {
                   )}
                 </div>
               </div>
+              {/* Footer */}
+              <div className="px-6 py-4 border-t border-creme-dark flex gap-3 shrink-0 bg-white rounded-b-3xl">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="flex-1 py-3 text-[13px] font-medium text-gris hover:text-texte hover:bg-creme/50 rounded-2xl transition-colors"
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  disabled={saveLoading}
+                  className="flex-1 py-3 px-6 bg-vert text-white rounded-2xl font-medium text-[13px] hover:bg-vert-mid transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-vert/20"
+                >
+                  {saveLoading ? (
+                    <>
+                      <Loader2 size={14} className="animate-spin" />
+                      Enregistrement...
+                    </>
+                  ) : (
+                    editingProduct ? 'Mettre à jour' : 'Ajouter le produit'
+                  )}
+                </button>
+              </div>
             </form>
-
-            {/* Footer */}
-            <div className="px-6 py-4 border-t border-creme-dark flex gap-3 shrink-0 bg-white rounded-b-3xl">
-              <button
-                type="button"
-                onClick={() => setIsModalOpen(false)}
-                className="flex-1 py-3 text-[13px] font-medium text-gris hover:text-texte hover:bg-creme/50 rounded-2xl transition-colors"
-              >
-                Annuler
-              </button>
-              <button
-                type="submit"
-                disabled={saveLoading}
-                className="flex-1 py-3 px-6 bg-vert text-white rounded-2xl font-medium text-[13px] hover:bg-vert-mid transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-vert/20"
-              >
-                {saveLoading ? (
-                  <>
-                    <Loader2 size={14} className="animate-spin" />
-                    Enregistrement...
-                  </>
-                ) : (
-                  editingProduct ? 'Mettre à jour' : 'Ajouter le produit'
-                )}
-              </button>
-            </div>
           </div>
         </div>
       )}
