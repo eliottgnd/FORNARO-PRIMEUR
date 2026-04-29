@@ -9,7 +9,11 @@ import { getProductImage } from '@/lib/product-image-utils'
 interface Promotion {
   id: string
   productId: string
-  discountPercent: number
+  type: 'percent' | 'fixed' | 'bundle'
+  discountPercent?: number | null
+  discountAmount?: number | null
+  bundleQuantity?: number | null
+  bundlePrice?: number | null
   label: string
   isActive: boolean
   product?: {
@@ -42,6 +46,7 @@ export default function Promotions() {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
   const [isCodeModalOpen, setIsCodeModalOpen] = useState<boolean>(false)
   const [editingPromo, setEditingPromo] = useState<Promotion | null>(null)
+  const [promoType, setPromoType] = useState<'percent' | 'fixed' | 'bundle'>('percent')
   const [saveLoading, setSaveLoading] = useState<boolean>(false)
   const [codeSaveLoading, setCodeSaveLoading] = useState<boolean>(false)
 
@@ -258,7 +263,7 @@ export default function Promotions() {
       <AnimateIn delay={0.1}>
         <div className="flex justify-end mb-4">
           <button
-            onClick={() => { setEditingPromo(null); setIsModalOpen(true); }}
+            onClick={() => { setEditingPromo(null); setPromoType('percent'); setIsModalOpen(true); }}
             className="btn-primary text-[12px] px-4 py-2 flex items-center gap-2"
           >
             <Plus size={14} />
@@ -272,7 +277,7 @@ export default function Promotions() {
         {isLoading ? (
           <div className="flex justify-center py-8"><Loader2 className="animate-spin text-vert" /></div>
         ) : (
-          promos.slice(0, 5).map((promo, i) => {
+          promos.map((promo, i) => {
             const produit = produits.find((p) => p.id === promo.productId)
             if (!produit) return null
             return (
@@ -297,12 +302,32 @@ export default function Promotions() {
                           {promo.label}
                         </span>
                         <span className="text-[10px] text-gris">
-                          {promo.discountPercent}% de reduction
+                          {promo.type === 'percent' && `${promo.discountPercent}% de réduction`}
+                          {promo.type === 'fixed' && `-${promo.discountAmount}€`}
+                          {promo.type === 'bundle' && `${promo.bundleQuantity} pour ${promo.bundlePrice}€`}
                         </span>
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      onClick={() => {
+                        setEditingPromo(promo)
+                        setPromoType(promo.type || 'percent')
+                        setIsModalOpen(true)
+                      }}
+                      className="p-1.5 text-gris hover:text-vert transition-colors"
+                      title="Modifier"
+                    >
+                      <Pencil size={13} />
+                    </button>
+                    <button
+                      onClick={() => deletePromo(promo.id)}
+                      className="p-1.5 text-gris hover:text-red-500 transition-colors"
+                      title="Supprimer"
+                    >
+                      <X size={13} />
+                    </button>
                     <button
                       onClick={() => togglePromo(promo.id, promo.isActive)}
                       className={`relative w-10 h-5 rounded-full transition-all ${
@@ -385,33 +410,129 @@ export default function Promotions() {
               </button>
             </div>
             <form onSubmit={handleSavePromotion} className="p-6 space-y-4">
-              <div className="space-y-4">
-                <div className="space-y-1">
-                  <label className="text-[12px] font-medium text-gris">Produit</label>
-                  <select
-                    name="productId"
-                    defaultValue={editingPromo?.productId || ''}
-                    required
-                    className="input-field w-full"
-                  >
-                    <option value="">Sélectionnez un produit...</option>
-                    {produits.map(p => (
-                      <option key={p.id} value={p.id}>{p.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-[12px] font-medium text-gris">Réduction (%)</label>
-                    <input name="discountPercent" type="number" defaultValue={editingPromo?.discountPercent || ''} required className="input-field w-full" />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[12px] font-medium text-gris">Label (ex: -20%)</label>
-                    <input name="label" defaultValue={editingPromo?.label || ''} className="input-field w-full" />
-                  </div>
+              {/* Produit */}
+              <div className="space-y-1">
+                <label className="text-[12px] font-medium text-gris">Produit</label>
+                <select
+                  name="productId"
+                  defaultValue={editingPromo?.productId || ''}
+                  required
+                  className="input-field w-full"
+                >
+                  <option value="">Sélectionnez un produit...</option>
+                  {produits.map(p => (
+                    <option key={p.id} value={p.id}>{p.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Type de promo */}
+              <div className="space-y-1">
+                <label className="text-[12px] font-medium text-gris">Type de promotion</label>
+                <input type="hidden" name="type" value={promoType} />
+                <div className="grid grid-cols-3 gap-2">
+                  {([
+                    { value: 'percent', label: '% Réduction' },
+                    { value: 'fixed',   label: '€ Réduction' },
+                    { value: 'bundle',  label: 'Lot' },
+                  ] as const).map(({ value, label }) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => setPromoType(value)}
+                      className={`py-2 rounded-xl text-[12px] font-medium border-2 transition-all ${
+                        promoType === value
+                          ? 'border-matcha bg-matcha/10 text-matcha'
+                          : 'border-creme-dark text-gris hover:border-matcha/40'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
                 </div>
               </div>
-              <div className="flex gap-3 pt-4">
+
+              {/* Champs selon le type */}
+              {promoType === 'percent' && (
+                <div className="space-y-1">
+                  <label className="text-[12px] font-medium text-gris">Réduction (%)</label>
+                  <input
+                    name="discountPercent"
+                    type="number"
+                    min="1"
+                    max="100"
+                    defaultValue={editingPromo?.discountPercent ?? ''}
+                    required
+                    className="input-field w-full"
+                    placeholder="ex: 20"
+                  />
+                </div>
+              )}
+
+              {promoType === 'fixed' && (
+                <div className="space-y-1">
+                  <label className="text-[12px] font-medium text-gris">Réduction (€)</label>
+                  <input
+                    name="discountAmount"
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    defaultValue={editingPromo?.discountAmount ?? ''}
+                    required
+                    className="input-field w-full"
+                    placeholder="ex: 2.00"
+                  />
+                </div>
+              )}
+
+              {promoType === 'bundle' && (
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-[12px] font-medium text-gris">Quantité du lot</label>
+                    <input
+                      name="bundleQuantity"
+                      type="number"
+                      min="2"
+                      defaultValue={editingPromo?.bundleQuantity ?? ''}
+                      required
+                      className="input-field w-full"
+                      placeholder="ex: 3"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[12px] font-medium text-gris">Prix du lot (€)</label>
+                    <input
+                      name="bundlePrice"
+                      type="number"
+                      min="0.01"
+                      step="0.01"
+                      defaultValue={editingPromo?.bundlePrice ?? ''}
+                      required
+                      className="input-field w-full"
+                      placeholder="ex: 5.00"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Label personnalisé */}
+              <div className="space-y-1">
+                <label className="text-[12px] font-medium text-gris">
+                  Label <span className="text-gris/60 font-normal">(optionnel, généré automatiquement)</span>
+                </label>
+                <input
+                  name="label"
+                  defaultValue={editingPromo?.label || ''}
+                  className="input-field w-full"
+                  placeholder={
+                    promoType === 'percent' ? 'ex: -20%' :
+                    promoType === 'fixed'   ? 'ex: -2€'  :
+                    'ex: 3 pour 5€'
+                  }
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}

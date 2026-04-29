@@ -19,13 +19,26 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
     const { id } = await params;
     const body = await req.json();
+    const { type, discountPercent, discountAmount, bundleQuantity, bundlePrice, ...rest } = body;
+
+    const data: Record<string, unknown> = { ...rest };
+
+    if (type) {
+      data.type = type;
+      data.discountPercent = type === "percent" && discountPercent ? parseInt(discountPercent) : null;
+      data.discountAmount = type === "fixed" && discountAmount ? parseFloat(discountAmount) : null;
+      data.bundleQuantity = type === "bundle" && bundleQuantity ? parseInt(bundleQuantity) : null;
+      data.bundlePrice = type === "bundle" && bundlePrice ? parseFloat(bundlePrice) : null;
+    } else {
+      if (discountPercent !== undefined) data.discountPercent = discountPercent ? parseInt(discountPercent) : null;
+      if (discountAmount !== undefined) data.discountAmount = discountAmount ? parseFloat(discountAmount) : null;
+      if (bundleQuantity !== undefined) data.bundleQuantity = bundleQuantity ? parseInt(bundleQuantity) : null;
+      if (bundlePrice !== undefined) data.bundlePrice = bundlePrice ? parseFloat(bundlePrice) : null;
+    }
 
     const updatedPromotion = await prisma.promotion.update({
       where: { id },
-      data: {
-        ...body,
-        discountPercent: body.discountPercent ? parseInt(body.discountPercent) : undefined,
-      },
+      data,
     });
 
     return NextResponse.json(updatedPromotion);

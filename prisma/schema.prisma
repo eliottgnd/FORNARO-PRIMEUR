@@ -115,12 +115,16 @@ model OrderItem {
 }
 
 model Promotion {
-  id              String @id @default(uuid())
+  id              String   @id @default(uuid())
   productId       String?
   product         Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
-  discountPercent Int
+  type            String   @default("percent") // "percent" | "fixed" | "bundle"
+  discountPercent Int?
+  discountAmount  Float?
+  bundleQuantity  Int?
+  bundlePrice     Float?
   label           String
-  isActive        Boolean @default(true)
+  isActive        Boolean  @default(true)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }

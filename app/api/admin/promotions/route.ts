@@ -40,17 +40,38 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { productId, discountPercent, label } = body;
+    const { productId, type = "percent", discountPercent, discountAmount, bundleQuantity, bundlePrice, label } = body;
 
-    if (!productId || !discountPercent) {
-      return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
+    if (!productId) {
+      return NextResponse.json({ message: "Produit requis" }, { status: 400 });
+    }
+
+    if (type === "percent" && !discountPercent) {
+      return NextResponse.json({ message: "Pourcentage requis" }, { status: 400 });
+    }
+    if (type === "fixed" && !discountAmount) {
+      return NextResponse.json({ message: "Montant de réduction requis" }, { status: 400 });
+    }
+    if (type === "bundle" && (!bundleQuantity || !bundlePrice)) {
+      return NextResponse.json({ message: "Quantité et prix du lot requis" }, { status: 400 });
+    }
+
+    let autoLabel = label;
+    if (!autoLabel) {
+      if (type === "percent") autoLabel = `-${discountPercent}%`;
+      else if (type === "fixed") autoLabel = `-${discountAmount}€`;
+      else autoLabel = `${bundleQuantity} pour ${bundlePrice}€`;
     }
 
     const promotion = await prisma.promotion.create({
       data: {
         productId,
-        discountPercent: parseInt(discountPercent),
-        label: label || `${discountPercent}% de réduction`,
+        type,
+        discountPercent: type === "percent" ? parseInt(discountPercent) : null,
+        discountAmount: type === "fixed" ? parseFloat(discountAmount) : null,
+        bundleQuantity: type === "bundle" ? parseInt(bundleQuantity) : null,
+        bundlePrice: type === "bundle" ? parseFloat(bundlePrice) : null,
+        label: autoLabel,
         isActive: true,
       },
     });

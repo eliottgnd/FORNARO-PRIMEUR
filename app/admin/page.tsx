@@ -156,26 +156,31 @@ export default function AdminDashboard() {
     }
   }
 
-  const extraireListeJour = () => {
-    if (!stats) return
-
+  const extraireListeJour = async () => {
     const now = new Date()
-    const mois = now.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
-    const { kpis, recentOrders, topClients, categoryDistribution = [], statusDistribution = [] } = stats
+    const dateParam = now.toISOString().split('T')[0]
+
+    const res = await fetch('/api/admin/stats?date=' + dateParam)
+    if (!res.ok) return
+    const dailyStats = await res.json()
+
+    const { kpis, recentOrders, topClients, categoryDistribution = [], statusDistribution = [] } = dailyStats
+
+    const jour = now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
 
     const lines: string[] = []
 
-    lines.push('RAPPORT MENSUEL - FORNARO PRIMEUR')
-    lines.push('Periode: ' + mois)
+    lines.push('RAPPORT JOURNALIER - FORNARO PRIMEUR')
+    lines.push('Journee: ' + jour)
     lines.push('Date export: ' + now.toLocaleDateString('fr-FR') + '\n')
 
-    lines.push('INDICATEURS CLES')
-    lines.push('Total Commandes,' + String(kpis?.orders || 0))
-    lines.push('Revenu Total,' + (kpis?.revenue?.toFixed(2) || '0.00') + ' EUR')
-    lines.push('Nombre Clients,' + String(kpis?.clients || 0))
-    lines.push('Nombre Produits,' + String(kpis?.products || 0) + '\n')
+    lines.push('INDICATEURS DU JOUR')
+    lines.push('Commandes du jour,' + String(kpis?.orders || 0))
+    lines.push('Revenu du jour,' + (kpis?.revenue?.toFixed(2) || '0.00') + ' EUR')
+    lines.push('Total Clients,' + String(kpis?.clients || 0))
+    lines.push('Total Produits,' + String(kpis?.products || 0) + '\n')
 
-    lines.push('STATUT DES COMMANDES')
+    lines.push('STATUT DES COMMANDES DU JOUR')
     lines.push('Statut,Nombre')
     ;(statusDistribution || []).forEach((s: any) => {
       const statut = s.status.charAt(0).toUpperCase() + s.status.slice(1)
@@ -191,18 +196,18 @@ export default function AdminDashboard() {
     })
     lines.push('')
 
-    lines.push('COMMANDES RECENTES')
-    lines.push('N Commande,Date,Client,Total (EUR),Statut,Paiement')
+    lines.push('COMMANDES DU JOUR')
+    lines.push('N Commande,Heure,Client,Total (EUR),Statut,Paiement')
     ;(recentOrders || []).forEach((cmd: OrderSummary) => {
-      const date = new Date(cmd.createdAt).toLocaleDateString('fr-FR')
+      const heure = new Date(cmd.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
       const client = cmd.user?.name || 'Inconnu'
       const statut = cmd.status === 'annulee' ? 'Annulee' : cmd.status === 'terminee' ? 'Terminee' : 'En cours'
       const paiement = cmd.paymentStatus === 'payee' ? 'Payee' : 'En attente'
-      lines.push(cmd.id + ',' + date + ',' + client + ',' + cmd.total.toFixed(2) + ',' + statut + ',' + paiement)
+      lines.push(cmd.id + ',' + heure + ',' + client + ',' + cmd.total.toFixed(2) + ',' + statut + ',' + paiement)
     })
     lines.push('')
 
-    lines.push('MEILLEURS CLIENTS')
+    lines.push('CLIENTS AYANT COMMANDE AUJOURD\'HUI')
     lines.push('Nom,Email,Commandes,Total (EUR)')
     ;(topClients || []).forEach((c: ClientSummary) => {
       lines.push((c.name || 'Utilisateur') + ',' + c.email + ',' + c._count.orders + ',' + (c.totalSpent?.toFixed(2) || '0.00'))
@@ -265,7 +270,7 @@ export default function AdminDashboard() {
               <div className="text-left">
                 <p>Exporter les données</p>
                 <p className="text-[11px] text-matcha-light font-normal">
-                  Rapport mensuel CSV
+                  Rapport journalier CSV
                 </p>
               </div>
             </button>

@@ -1,47 +1,52 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { marches } from '@/lib/data'
-import { AnimateIn } from '@/components/layout/AnimateIn'
-import { Send, MapPin, Clock, Phone, Mail } from 'lucide-react'
+import { useState } from "react";
+import { marches } from "@/lib/data";
+import { AnimateIn } from "@/components/layout/AnimateIn";
+import { Send, MapPin, Clock, Phone, Mail } from "lucide-react";
 
 export default function Contact() {
   const [form, setForm] = useState({
-    prenom:    '',
-    nom:       '',
-    email:     '',
-    telephone: '',
-    sujet:     '',
-    message:   '',
-  })
-  const [envoye, setEnvoye] = useState(false)
+    prenom: "",
+    nom: "",
+    email: "",
+    telephone: "",
+    sujet: "",
+    message: "",
+  });
+  const [envoye, setEnvoye] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
-  }
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = () => {
-    setEnvoye(true)
-    setTimeout(() => setEnvoye(false), 3000)
-  }
+    setEnvoye(true);
+    setTimeout(() => setEnvoye(false), 3000);
+  };
 
   return (
     <div className=" min-h-screen bg-blanc">
-
       {/* ── HEADER ───────────────────────────────────────────── */}
       <div className="bg-vert px-6 md:px-20 py-12 md:py-16 relative overflow-hidden">
         <div className="absolute -top-20 -right-20 w-96 h-96 rounded-full bg-matcha/10 blur-3xl" />
         <AnimateIn>
           <p className="section-eyebrow text-matcha-light mb-3">On est là</p>
-          <h1 className="font-display text-4xl md:text-5xl text-creme mb-4">Contactez-nous</h1>
+          <h1 className="font-display text-4xl md:text-5xl text-creme mb-4">
+            Contactez-nous
+          </h1>
           <p className="text-creme/50 text-[14px] md:text-[15px] max-w-md">
-            Une question, une suggestion ou une commande spéciale ? On vous répond dans les plus brefs délais.
+            Une question, une suggestion ou une commande spéciale ? On vous
+            répond dans les plus brefs délais.
           </p>
         </AnimateIn>
       </div>
 
       <div className="px-6 md:px-20 py-12 md:py-20 grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-20">
-
         {/* ── FORMULAIRE ───────────────────────────────────────── */}
         <AnimateIn direction="left">
           <h2 className="font-display text-2xl md:text-3xl text-vert mb-6 md:mb-8">
@@ -49,7 +54,6 @@ export default function Contact() {
           </h2>
 
           <div className="space-y-4">
-
             {/* Prénom + Nom */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
@@ -150,14 +154,13 @@ export default function Contact() {
               onClick={handleSubmit}
               className={`w-full flex items-center justify-center gap-2 rounded-2xl py-3 md:py-4 font-semibold text-[14px] transition-all ${
                 envoye
-                  ? 'bg-matcha text-white scale-[0.98]'
-                  : 'bg-vert text-white hover:bg-vert-mid'
+                  ? "bg-matcha text-white scale-[0.98]"
+                  : "bg-vert text-white hover:bg-vert-mid"
               }`}
             >
               <Send size={16} />
-              {envoye ? 'Message envoyé !' : 'Envoyer le message'}
+              {envoye ? "Message envoyé !" : "Envoyer le message"}
             </button>
-
           </div>
         </AnimateIn>
 
@@ -169,43 +172,65 @@ export default function Contact() {
 
           <div className="space-y-3 md:space-y-4 mb-8 md:mb-12">
             {[
-              { icon: Mail,  label: 'Email',     valeur: 'contact@fornaro-primeur.fr' },
-              { icon: Phone, label: 'Téléphone', valeur: '+33 06 35 12 33 74'         },
-              { icon: Clock, label: 'Horaires',  valeur: 'Mar-Ven : 7h00 – 20h00'    },
+              {
+                icon: Mail,
+                label: "Email",
+                valeur: "jf.fornaro.pro@gmail.com",
+              },
+              { icon: Phone, label: "Téléphone", valeur: "+33 06 35 12 33 74" },
+              {
+                icon: Clock,
+                label: "Horaires",
+                valeur: "Mar-Ven : 7h00 – 20h00",
+              },
             ].map((info) => (
-              <div key={info.label} className="flex items-center gap-3 md:gap-4 bg-white rounded-2xl p-4 md:p-5 border border-creme-dark">
+              <div
+                key={info.label}
+                className="flex items-center gap-3 md:gap-4 bg-white rounded-2xl p-4 md:p-5 border border-creme-dark"
+              >
                 <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-creme flex items-center justify-center text-matcha shrink-0">
                   <info.icon size={17} />
                 </div>
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-gris">{info.label}</p>
-                  <p className="text-[13px] md:text-[14px] text-texte font-medium mt-0.5">{info.valeur}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Marchés */}
-          <h3 className="font-display text-lg md:text-xl text-vert mb-4 md:mb-5">Nos marchés</h3>
-          <div className="space-y-3 md:space-y-4">
-            {marches.map((m) => (
-              <div key={m.id} className="flex items-start gap-3 md:gap-4 bg-creme rounded-2xl p-4 md:p-5 border border-creme-dark">
-                <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-white flex items-center justify-center text-matcha border border-creme-dark shrink-0">
-                  <MapPin size={17} />
-                </div>
-                <div>
-                  <p className="text-[13px] md:text-[14px] font-semibold text-vert">{m.nom}</p>
-                  <p className="text-[12px] md:text-[13px] text-gris mt-0.5 leading-relaxed">
-                    {m.adresse}<br />{m.ville}
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-gris">
+                    {info.label}
+                  </p>
+                  <p className="text-[13px] md:text-[14px] text-texte font-medium mt-0.5">
+                    {info.valeur}
                   </p>
                 </div>
               </div>
             ))}
           </div>
 
+          {/* Marchés */}
+          <h3 className="font-display text-lg md:text-xl text-vert mb-4 md:mb-5">
+            Nos marchés
+          </h3>
+          <div className="space-y-3 md:space-y-4">
+            {marches.map((m) => (
+              <div
+                key={m.id}
+                className="flex items-start gap-3 md:gap-4 bg-creme rounded-2xl p-4 md:p-5 border border-creme-dark"
+              >
+                <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-white flex items-center justify-center text-matcha border border-creme-dark shrink-0">
+                  <MapPin size={17} />
+                </div>
+                <div>
+                  <p className="text-[13px] md:text-[14px] font-semibold text-vert">
+                    {m.nom}
+                  </p>
+                  <p className="text-[12px] md:text-[13px] text-gris mt-0.5 leading-relaxed">
+                    {m.adresse}
+                    <br />
+                    {m.ville}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
         </AnimateIn>
       </div>
-
     </div>
-  )
+  );
 }

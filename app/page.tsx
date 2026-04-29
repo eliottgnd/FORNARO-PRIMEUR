@@ -20,6 +20,14 @@ export default function Home() {
   const heroCardRef = useRef<HTMLDivElement>(null);
   const heroRightRef = useRef<HTMLDivElement>(null);
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [zones, setZones] = useState<string[]>([]);
+
+  useEffect(() => {
+    fetch("/api/delivery-settings")
+      .then((r) => r.json())
+      .then((data) => setZones(data.zonesActives ?? []))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (
@@ -105,6 +113,24 @@ export default function Home() {
               Livraison les matinées du mardi au vendredi
             </span>
           </div>
+
+          {zones.length > 0 && (
+            <div className="mb-6 md:mb-8">
+              <p className="text-[9px] md:text-[10px] text-creme/40 uppercase tracking-widest mb-2">
+                Villes desservies
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {zones.map((ville) => (
+                  <span
+                    key={ville}
+                    className="text-[9px] md:text-[10px] text-creme/70 bg-white/5 border border-white/10 rounded px-2 py-0.5 font-normal"
+                  >
+                    {ville}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
 
           <h1
             ref={heroTitleRef}

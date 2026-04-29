@@ -11,58 +11,80 @@ async function checkAdmin() {
   return true;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     if (!await checkAdmin()) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    // 1. Total Revenue
+    const { searchParams } = new URL(request.url);
+    const dateParam = searchParams.get("date");
+
+    let orderWhere = {};
+    if (dateParam) {
+      const start = new Date(dateParam);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(dateParam);
+      end.setHours(23, 59, 59, 999);
+      orderWhere = { createdAt: { gte: start, lte: end } };
+    }
+
     const totalRevenue = await prisma.order.aggregate({
       _sum: { total: true },
+      where: orderWhere,
     });
 
-    // 2. Total Orders
-    const totalOrders = await prisma.order.count();
+    const totalOrders = await prisma.order.count({ where: orderWhere });
 
-    // 3. Total Clients
     const totalClients = await prisma.user.count();
-
-    // 4. Total Products
     const totalProducts = await prisma.product.count();
 
-    // 5. Recent Orders
     const recentOrders = await prisma.order.findMany({
-      take: 5,
+      where: orderWhere,
+      take: dateParam ? undefined : 5,
       orderBy: { createdAt: "desc" },
       include: {
         user: { select: { name: true } },
       },
     });
 
-    // 6. Top Clients
-    const topClients = await prisma.user.findMany({
-      take: 5,
-      orderBy: {
-        orders: {
-          _count: 'desc'
+    // For daily reports, derive top clients from the filtered orders
+    let topClients;
+    if (dateParam) {
+      const ordersWithUsers = await prisma.order.findMany({
+        where: orderWhere,
+        include: { user: { select: { id: true, name: true, email: true } } },
+      });
+      const clientMap = new Map<string, { id: string; name: string | null; email: string; _count: { orders: number }; totalSpent: number }>();
+      for (const order of ordersWithUsers) {
+        const uid = order.userId;
+        if (!clientMap.has(uid)) {
+          clientMap.set(uid, { id: uid, name: order.user.name, email: order.user.email, _count: { orders: 0 }, totalSpent: 0 });
         }
-      },
-      include: {
-        _count: { select: { orders: true } }
+        const c = clientMap.get(uid)!;
+        c._count.orders++;
+        c.totalSpent += order.total;
       }
-    });
+      topClients = Array.from(clientMap.values())
+        .sort((a, b) => b.totalSpent - a.totalSpent)
+        .slice(0, 5);
+    } else {
+      topClients = await prisma.user.findMany({
+        take: 5,
+        orderBy: { orders: { _count: "desc" } },
+        include: { _count: { select: { orders: true } } },
+      });
+    }
 
-    // 7. Category Distribution
     const categoryDistribution = await prisma.product.groupBy({
-      by: ['category'],
-      _count: { id: true }
+      by: ["category"],
+      _count: { id: true },
     });
 
-    // 8. Order Status Distribution
     const statusDistribution = await prisma.order.groupBy({
-      by: ['status'],
-      _count: { id: true }
+      by: ["status"],
+      _count: { id: true },
+      where: orderWhere,
     });
 
     return NextResponse.json({
