@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { clsx } from 'clsx'
-import { LayoutDashboard, Package, Tag, Users, Truck, LogOut, Menu, X, ShoppingBag } from 'lucide-react'
+import { LayoutDashboard, Package, Tag, Users, Truck, LogOut, Menu, X, ShoppingBag, CalendarDays } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 
@@ -13,6 +13,7 @@ const liens = [
   { label: 'Commandes',           href: '/admin/commandes',  icon: ShoppingBag     },
   { label: 'Promotions',          href: '/admin/promotions', icon: Tag             },
   { label: 'Clients',             href: '/admin/clients',    icon: Users           },
+  { label: 'Créneaux',            href: '/admin/creneaux',   icon: CalendarDays    },
   { label: 'Param. livraison',    href: '/admin/livraison',  icon: Truck           },
 ]
 

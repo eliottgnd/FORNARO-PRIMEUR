@@ -11,6 +11,7 @@ import {
   AlertCircle,
   AlertTriangle,
   Truck,
+  CalendarDays,
 } from "lucide-react";
 import Link from "next/link";
 import { getProductImage } from "@/lib/product-image-utils";
@@ -37,13 +38,18 @@ export default function PanierPage() {
     minimumCommande: number;
     zonesActives: string[];
   }>({ fraisLivraison: 0, minimumCommande: 0, zonesActives: [] });
+  const [deliverySlots, setDeliverySlots] = useState<Array<{
+    id: string; date: string; label: string | null; maxCapacity: number; booked: number; remaining: number;
+  }>>([]);
+  const [selectedSlotId, setSelectedSlotId] = useState<string>("");
   const { showToast } = useToast();
 
   useEffect(() => {
     async function fetchData() {
-      const [addrRes, settingsRes] = await Promise.all([
+      const [addrRes, settingsRes, slotsRes] = await Promise.all([
         fetch("/api/user/addresses", { credentials: "include" }),
         fetch("/api/delivery-settings"),
+        fetch("/api/delivery-slots"),
       ]);
 
       if (addrRes.ok) {
@@ -62,6 +68,12 @@ export default function PanierPage() {
           minimumCommande: settings.minimumCommande || 0,
           zonesActives: settings.zonesActives || [],
         });
+      }
+
+      if (slotsRes.ok) {
+        const slots = await slotsRes.json();
+        setDeliverySlots(slots);
+        if (slots.length > 0) setSelectedSlotId(slots[0].id);
       }
     }
     fetchData();
@@ -119,6 +131,11 @@ export default function PanierPage() {
       return;
     }
 
+    if (deliverySlots.length > 0 && !selectedSlotId) {
+      showToast("Veuillez choisir un créneau de livraison", "error");
+      return;
+    }
+
     if (hasUnavailableItems) {
       showToast("Retirez les produits non disponibles dans votre ville", "error");
       return;
@@ -170,6 +187,7 @@ export default function PanierPage() {
           total: finalTotal,
           addressId: finalAddressId,
           deliveryCost: deliveryCost,
+          deliverySlotId: selectedSlotId || undefined,
         }),
       });
 
@@ -465,6 +483,55 @@ export default function PanierPage() {
               </div>
             )}
 
+            {/* Créneau de livraison */}
+            {deliverySlots.length > 0 && (
+              <div className="mb-6">
+                <label className="text-[11px] font-semibold uppercase text-gris mb-2 block flex items-center gap-1.5">
+                  <CalendarDays size={13} /> Créneau de livraison
+                </label>
+                <div className="space-y-2">
+                  {deliverySlots.map((slot) => {
+                    const d = new Date(slot.date)
+                    const jours = ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.']
+                    const mois = ['jan', 'fév', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sep', 'oct', 'nov', 'déc']
+                    const label = `${jours[d.getDay()]} ${d.getDate()} ${mois[d.getMonth()]}`
+                    const isSelected = selectedSlotId === slot.id
+                    return (
+                      <button
+                        key={slot.id}
+                        type="button"
+                        onClick={() => setSelectedSlotId(slot.id)}
+                        className={clsx(
+                          "w-full flex items-center justify-between px-3 py-2.5 rounded-xl border-2 text-sm transition-all",
+                          isSelected
+                            ? "border-matcha bg-matcha/5 text-vert"
+                            : "border-creme-dark bg-white text-gris hover:border-matcha/40"
+                        )}
+                      >
+                        <span className="font-medium">
+                          {label}
+                          {slot.label && <span className="font-normal ml-1 text-gris text-xs">· {slot.label}</span>}
+                        </span>
+                        <span className={clsx(
+                          "text-[11px] font-medium",
+                          slot.remaining <= 2 ? "text-orange-500" : "text-matcha"
+                        )}>
+                          {slot.remaining} place{slot.remaining > 1 ? 's' : ''} restante{slot.remaining > 1 ? 's' : ''}
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            {deliverySlots.length === 0 && (
+              <div className="mb-6 flex items-center gap-2 p-3 rounded-xl bg-orange-50 border border-orange-200 text-orange-700 text-sm">
+                <CalendarDays size={15} className="shrink-0" />
+                <span>Aucun créneau de livraison disponible pour le moment.</span>
+              </div>
+            )}
+
             <div className="mb-6">
               <label className="text-[11px] font-semibold uppercase text-gris mb-2 block">
                 Mode de paiement
@@ -521,14 +588,16 @@ export default function PanierPage() {
               isLoading ||
               hasUnavailableItems ||
               (addressMode === "saved" && (!addresses.length || !address.id)) ||
-              (addressMode === "custom" && (!address.street || !selectedCity || !address.zipCode))
+              (addressMode === "custom" && (!address.street || !selectedCity || !address.zipCode)) ||
+              (deliverySlots.length > 0 && !selectedSlotId)
             }
             className={clsx(
               "w-full py-4 rounded-2xl font-semibold transition-all flex items-center justify-center gap-2",
               isLoading ||
               hasUnavailableItems ||
               (addressMode === "saved" && (!addresses.length || !address.id)) ||
-              (addressMode === "custom" && (!address.street || !selectedCity || !address.zipCode))
+              (addressMode === "custom" && (!address.street || !selectedCity || !address.zipCode)) ||
+              (deliverySlots.length > 0 && !selectedSlotId)
                 ? "bg-gris text-white cursor-not-allowed"
                 : "btn-primary",
             )}

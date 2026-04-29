@@ -87,6 +87,18 @@ model ProductAvailability {
   @@unique([productId, city])
 }
 
+model DeliverySlot {
+  id          String   @id @default(uuid())
+  date        DateTime
+  label       String?
+  maxCapacity Int
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orders      Order[]
+}
+
 model Order {
   id              String   @id @default(uuid())
   userId           String
@@ -98,6 +110,8 @@ model Order {
   deliveryCost    Float    @default(0)
   addressId       String?
   address         Address? @relation(fields: [addressId], references: [id])
+  deliverySlotId  String?
+  deliverySlot    DeliverySlot? @relation(fields: [deliverySlotId], references: [id])
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 

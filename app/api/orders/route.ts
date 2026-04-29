@@ -16,10 +16,30 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json()
-    const { items, addressId, total, deliveryCost } = body
+    const { items, addressId, total, deliveryCost, deliverySlotId } = body
 
     if (!items || items.length === 0) {
       return NextResponse.json({ error: 'Le panier est vide' }, { status: 400 })
+    }
+
+    // Validate delivery slot capacity
+    if (deliverySlotId) {
+      const slot = await prisma.deliverySlot.findUnique({
+        where: { id: deliverySlotId },
+        include: {
+          _count: {
+            select: {
+              orders: { where: { status: { not: "annulee" }, paymentStatus: { not: "echec" } } },
+            },
+          },
+        },
+      });
+      if (!slot || !slot.isActive) {
+        return NextResponse.json({ error: "Créneau de livraison indisponible" }, { status: 400 });
+      }
+      if (slot._count.orders >= slot.maxCapacity) {
+        return NextResponse.json({ error: "Ce créneau est complet" }, { status: 400 });
+      }
     }
 
     // Validate stock availability before creating anything
@@ -73,6 +93,7 @@ export async function POST(req: NextRequest) {
         paymentId: checkout.id,
         addressId: addressId,
         deliveryCost: deliveryCost || 0,
+        deliverySlotId: deliverySlotId || null,
       },
     })
 
