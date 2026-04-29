@@ -21,11 +21,16 @@ export default function Home() {
   const heroRightRef = useRef<HTMLDivElement>(null);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [zones, setZones] = useState<string[]>([]);
+  const [conseil, setConseil] = useState({ emoji: '🍓', titre: 'Le conseil du primeur', texte: 'Les fraises sont particulièrement sucrées cette semaine.' });
 
   useEffect(() => {
     fetch("/api/delivery-settings")
       .then((r) => r.json())
       .then((data) => setZones(data.zonesActives ?? []))
+      .catch(() => {});
+    fetch("/api/conseil")
+      .then((r) => r.json())
+      .then((data) => setConseil(data))
       .catch(() => {});
   }, []);
 
@@ -189,13 +194,13 @@ export default function Home() {
               ref={heroCardRef}
               className="relative z-10 bg-white rounded-2xl p-3 md:p-4 flex gap-3 shadow-xl max-w-xs opacity-0"
             >
-              <span className="text-2xl md:text-3xl">🍓</span>
+              <span className="text-2xl md:text-3xl">{conseil.emoji}</span>
               <div>
                 <p className="text-[10px] md:text-[11px] font-semibold uppercase tracking-widest text-matcha">
-                  Le conseil du primeur
+                  {conseil.titre}
                 </p>
                 <p className="text-[12px] md:text-[13px] text-texte leading-snug mt-1">
-                  Les fraises sont particulierement sucrees cette semaine.
+                  {conseil.texte}
                 </p>
               </div>
             </div>

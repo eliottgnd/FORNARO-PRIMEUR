@@ -49,17 +49,20 @@ export default function Promotions() {
   const [promoType, setPromoType] = useState<'percent' | 'fixed' | 'bundle'>('percent')
   const [saveLoading, setSaveLoading] = useState<boolean>(false)
   const [codeSaveLoading, setCodeSaveLoading] = useState<boolean>(false)
+  const [conseil, setConseil] = useState({ emoji: '🍓', titre: 'Le conseil du primeur', texte: '' })
+  const [conseilSaving, setConseilSaving] = useState(false)
 
   const { banniere, setBanniere } = useBanniere()
 
   const fetchAll = async () => {
     setIsLoading(true)
     try {
-      const [pRes, cRes, prRes, bRes] = await Promise.all([
+      const [pRes, cRes, prRes, bRes, cslRes] = await Promise.all([
         fetch('/api/admin/promotions'),
         fetch('/api/admin/promo-codes'),
         fetch('/api/admin/products'),
-        fetch('/api/admin/banners')
+        fetch('/api/admin/banners'),
+        fetch('/api/admin/conseil'),
       ])
       if (pRes.ok) setPromos(await pRes.json())
       if (cRes.ok) setCodes(await cRes.json())
@@ -68,6 +71,7 @@ export default function Promotions() {
         const bannerData = await bRes.json()
         setBanniere(bannerData)
       }
+      if (cslRes.ok) setConseil(await cslRes.json())
     } catch (e) {
       console.error("Failed to fetch promotions:", e)
     } finally {
@@ -345,6 +349,75 @@ export default function Promotions() {
           })
         )}
       </div>
+
+      {/* Conseil du primeur */}
+      <AnimateIn delay={0.18}>
+        <div className="bg-white rounded-2xl border border-creme-dark p-4 md:p-5 mb-6">
+          <h2 className="font-display text-base md:text-lg text-vert mb-4">Conseil du primeur</h2>
+
+          {/* Aperçu */}
+          <div className="flex items-start gap-3 bg-creme/40 rounded-xl p-3 mb-4 border border-creme-dark max-w-xs">
+            <span className="text-2xl">{conseil.emoji}</span>
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-matcha">{conseil.titre}</p>
+              <p className="text-[12px] text-texte leading-snug mt-1">{conseil.texte || '…'}</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="text-[11px] font-medium text-gris uppercase tracking-wider mb-1.5 block">Emoji</label>
+              <input
+                type="text"
+                value={conseil.emoji}
+                onChange={(e) => setConseil({ ...conseil, emoji: e.target.value })}
+                className="input-field"
+                placeholder="🍓"
+              />
+            </div>
+            <div>
+              <label className="text-[11px] font-medium text-gris uppercase tracking-wider mb-1.5 block">Titre</label>
+              <input
+                type="text"
+                value={conseil.titre}
+                onChange={(e) => setConseil({ ...conseil, titre: e.target.value })}
+                className="input-field"
+                placeholder="Le conseil du primeur"
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="text-[11px] font-medium text-gris uppercase tracking-wider mb-1.5 block">Message</label>
+              <textarea
+                value={conseil.texte}
+                onChange={(e) => setConseil({ ...conseil, texte: e.target.value })}
+                className="input-field resize-none"
+                rows={2}
+                placeholder="Les fraises sont particulièrement sucrées cette semaine."
+              />
+            </div>
+          </div>
+
+          <button
+            onClick={async () => {
+              setConseilSaving(true)
+              try {
+                const res = await fetch('/api/admin/conseil', {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(conseil),
+                })
+                if (!res.ok) throw new Error()
+              } finally {
+                setConseilSaving(false)
+              }
+            }}
+            disabled={conseilSaving}
+            className="mt-4 w-full py-2 rounded-lg bg-vert text-white text-[12px] font-semibold hover:bg-vert-mid transition-colors disabled:opacity-50"
+          >
+            {conseilSaving ? 'Enregistrement...' : 'Enregistrer'}
+          </button>
+        </div>
+      </AnimateIn>
 
       {/* Codes promos */}
       <AnimateIn delay={0.2}>
