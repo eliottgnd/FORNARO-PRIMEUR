@@ -239,12 +239,18 @@ export default function Produits() {
                       <div className="flex items-center justify-between gap-2">
                         <p className="text-[13px] md:text-[15px] font-medium text-texte">{p.nom}</p>
                         {(() => {
-                          const { hasPromotion, discountPercent } = calculateDiscount(p);
-                          return hasPromotion ? (
+                          const { hasPromotion, discountPercent, promotionType, promotion } = calculateDiscount(p);
+                          if (!hasPromotion) return null;
+                          const label = promotionType === 'bundle'
+                            ? `${promotion.bundleQuantity} pour ${promotion.bundlePrice}€`
+                            : promotionType === 'fixed'
+                            ? `-${promotion.discountAmount}€`
+                            : `-${discountPercent}%`;
+                          return (
                             <span className="bg-matcha text-white text-[9px] font-bold px-1.5 rounded-sm shrink-0">
-                              -{discountPercent}%
+                              {label}
                             </span>
-                          ) : null;
+                          );
                         })()}
                       </div>
                       <p className="text-[11px] md:text-[12px] text-gris mt-1 hidden md:block">{p.description}</p>

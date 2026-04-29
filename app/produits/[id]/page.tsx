@@ -153,7 +153,7 @@ export default function FicheProduit() {
     }
   }
 
-  const { originalPrice, discountedPrice, discountPercent, hasPromotion } = calculateDiscount(produit)
+  const { originalPrice, discountedPrice, discountPercent, hasPromotion, promotionType, promotion } = calculateDiscount(produit)
 
   return (
     <div className="min-h-screen bg-blanc">
@@ -237,11 +237,17 @@ export default function FicheProduit() {
                   <>
                     <div className="flex items-center gap-2">
                       <span className="bg-matcha text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                        -{discountPercent}%
+                        {promotionType === 'bundle'
+                          ? `${promotion.bundleQuantity} pour ${promotion.bundlePrice}€`
+                          : promotionType === 'fixed'
+                          ? `-${promotion.discountAmount}€`
+                          : `-${discountPercent}%`}
                       </span>
-                      <span className="font-display text-2xl md:text-3xl text-gris line-through decoration-gris/50">
-                        {originalPrice.toFixed(2)}€
-                      </span>
+                      {promotionType !== 'bundle' && (
+                        <span className="font-display text-2xl md:text-3xl text-gris line-through decoration-gris/50">
+                          {originalPrice.toFixed(2)}€
+                        </span>
+                      )}
                     </div>
                   </>
                 )}
