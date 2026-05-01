@@ -38,7 +38,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="min-h-screen bg-blanc flex flex-col md:flex-row">
+    <div className="bg-blanc flex flex-col md:flex-row md:h-screen">
 
       {/* ── SIDEBAR DESKTOP ──────────────────────────────────── */}
       <aside className="hidden md:flex w-72 bg-vert flex-col py-10 px-6 shrink-0">
@@ -119,7 +119,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       )}
 
       {/* ── CONTENU ──────────────────────────────────────────── */}
-      <main className="flex-1 p-6 md:p-12 overflow-y-auto">
+      <main className="flex-1 p-6 md:p-12 md:overflow-y-auto">
         {children}
       </main>
 
