@@ -32,9 +32,73 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://fornaroprimeur.fr' },
 }
 
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'LocalBusiness',
+      '@id': 'https://fornaroprimeur.fr/#business',
+      name: 'Fornaro Primeur',
+      url: 'https://fornaroprimeur.fr',
+      description: 'Primeur en ligne au Pays Basque. Fruits, légumes et produits frais sélectionnés chaque jour, livrés à domicile à Biarritz, Hendaye et alentours.',
+      image: 'https://fornaroprimeur.fr/images/hero-bg.jpg',
+      priceRange: '€€',
+      servesCuisine: 'Fruits et légumes frais',
+      areaServed: ['Biarritz', 'Hendaye', 'Pays Basque'],
+      hasMap: [
+        'https://maps.google.com/?q=Rue+des+Halles,+64200+Biarritz',
+        'https://maps.google.com/?q=Marché+de+Sokoburu,+64700+Hendaye',
+      ],
+      location: [
+        {
+          '@type': 'Place',
+          name: 'Marché de Biarritz',
+          address: {
+            '@type': 'PostalAddress',
+            streetAddress: 'Rue des Halles',
+            addressLocality: 'Biarritz',
+            postalCode: '64200',
+            addressCountry: 'FR',
+          },
+        },
+        {
+          '@type': 'Place',
+          name: "Marché d'Hendaye — Marché de Sokoburu",
+          address: {
+            '@type': 'PostalAddress',
+            streetAddress: 'Marché de Sokoburu',
+            addressLocality: 'Hendaye',
+            postalCode: '64700',
+            addressCountry: 'FR',
+          },
+        },
+      ],
+      sameAs: ['https://fornaroprimeur.fr'],
+    },
+    {
+      '@type': 'WebSite',
+      '@id': 'https://fornaroprimeur.fr/#website',
+      url: 'https://fornaroprimeur.fr',
+      name: 'Fornaro Primeur',
+      publisher: { '@id': 'https://fornaroprimeur.fr/#business' },
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: 'https://fornaroprimeur.fr/produits?q={search_term_string}',
+        'query-input': 'required name=search_term_string',
+      },
+    },
+  ],
+}
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr" translate="no" suppressHydrationWarning>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body>
         <AuthProvider>
           <ToastProvider>
