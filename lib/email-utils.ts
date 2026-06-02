@@ -17,9 +17,9 @@ export async function sendEmail({
     from: process.env.EMAIL_FROM || "noreply@fornaroprimeur.fr",
     to,
     subject,
-    html,
-    text,
-  });
+    html: html ?? "",
+    text: text ?? "",
+  } as any);
 }
 
 export function generateCode(): string {
