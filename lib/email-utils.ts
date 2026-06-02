@@ -13,13 +13,16 @@ export async function sendEmail({
   html?: string;
   text?: string;
 }) {
-  return resend.emails.send({
-    from: process.env.EMAIL_FROM || "noreply@fornaroprimeur.fr",
+  const { data, error } = await resend.emails.send({
+    from: process.env.EMAIL_FROM || "onboarding@resend.dev",
     to,
     subject,
     html: html ?? "",
     text: text ?? "",
   } as any);
+
+  if (error) throw new Error(error.message);
+  return data;
 }
 
 export function generateCode(): string {
