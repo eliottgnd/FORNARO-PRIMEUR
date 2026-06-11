@@ -204,7 +204,7 @@ export default function APropos() {
             {/* ← remplace le src par ton image */}
             <div className="aspect-[4/3] rounded-3xl overflow-hidden relative">
               <Image
-                src="/images/histoire.jpg"
+                src="/images/histoire.webp"
                 alt="Histoire Fornaro"
                 fill
                 className="object-cover"

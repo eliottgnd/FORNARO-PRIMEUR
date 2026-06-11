@@ -247,7 +247,7 @@ export const marches: Marche[] = [
     adresse: "(Entre les 2 Halles) — Rue des Halles",
     ville: "64200 Biarritz",
     emoji: "🏛️",
-    image: "/images/marche-biarritz.jpg", // à remplacer par la vraie photo
+    image: "/images/marche-biarritz.webp",
   },
   {
     id: "m2",
