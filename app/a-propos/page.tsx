@@ -99,10 +99,11 @@ export default function APropos() {
           className="relative overflow-hidden min-h-[280px] md:min-h-0"
         >
           <Image
-            src="/images/fornaro-logo.png"
-            alt="Fornaro Primeur"
+            src="/images/apropos-hero.webp"
+            alt="Étal de fruits Fornaro Primeur"
             fill
             className="object-cover"
+            priority
           />
         </AnimateIn>
       </div>

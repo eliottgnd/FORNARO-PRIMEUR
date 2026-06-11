@@ -181,12 +181,16 @@ export default function Home() {
           className="flex flex-col bg-creme opacity-0 min-h-[400px] md:min-h-0"
         >
           <div className="flex-1 relative flex items-end p-6 md:p-8 overflow-hidden">
-            <Image
-              src="/images/hero-bg.jpg"
-              alt="Fruits et légumes frais"
-              fill
-              className="object-cover"
-              priority
+            <video
+              src="/images/hero-bg.webm"
+              poster="/images/hero-bg.jpg"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              aria-label="Fruits et légumes frais"
+              className="absolute inset-0 w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-black/20" />
 
