@@ -10,6 +10,13 @@ import { AnimateIn } from "@/components/layout/AnimateIn";
 import { AuthModal } from "@/components/ui/AuthModal";
 import { calculateDiscount } from "@/lib/price-utils";
 import { getProductImage } from "@/lib/product-image-utils";
+import {
+  IconPanier,
+  IconColis,
+  IconAube,
+  IconCamion,
+  CategoryIcon,
+} from "@/components/ui/Illustrations";
 import Image from "next/image";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -249,25 +256,25 @@ export default function Home() {
           {[
             {
               num: "1",
-              icon: "🛍️",
+              Icon: IconPanier,
               titre: "Je choisis mes produits",
               desc: "Parcourez notre sélection.",
             },
             {
               num: "2",
-              icon: "📦",
+              Icon: IconColis,
               titre: "Je passe commande",
               desc: "Validez votre panier. Choisissez votre créneau de livraison.",
             },
             {
               num: "3",
-              icon: "🌅",
+              Icon: IconAube,
               titre: "Notre équipe prépare",
               desc: "Chaque matin, nous sélectionnons et préparons votre commande sur le marché.",
             },
             {
               num: "4",
-              icon: "🚐",
+              Icon: IconCamion,
               titre: "Livré chez vous",
               desc: "Vos produits sont livrés frais à votre porte, directement depuis les halles de Biarritz.",
               cta: true,
@@ -278,7 +285,9 @@ export default function Home() {
                 <span className="absolute top-5 right-6 font-display text-5xl md:text-6xl text-creme-dark leading-none">
                   {s.num}
                 </span>
-                <div className="text-3xl mb-4 md:mb-5">{s.icon}</div>
+                <div className="mb-4 md:mb-5 w-12 h-12 rounded-2xl bg-creme flex items-center justify-center text-vert">
+                  <s.Icon className="w-7 h-7" />
+                </div>
                 <h3 className="font-display text-[16px] md:text-[18px] text-vert mb-2">
                   {s.titre}
                 </h3>
@@ -314,8 +323,12 @@ export default function Home() {
                 <div
                   className={`relative rounded-3xl overflow-hidden aspect-[3/2] bg-gradient-to-br ${cat.bg} cursor-pointer hover:scale-[1.02] transition-transform`}
                 >
-                  <div className="absolute inset-0 flex items-center justify-center text-5xl md:text-7xl opacity-40">
-                    {cat.emoji}
+                  <div className="absolute inset-0 flex items-center justify-center text-vert/40">
+                    <CategoryIcon
+                      id={cat.id}
+                      className="w-20 h-20 md:w-28 md:h-28"
+                      strokeWidth={1.3}
+                    />
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-vert/80 to-transparent p-3 md:p-5">
                     <p className="font-display text-base md:text-xl text-white">

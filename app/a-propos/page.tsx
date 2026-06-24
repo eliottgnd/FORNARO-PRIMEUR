@@ -4,6 +4,12 @@ import Link from "next/link";
 import { marches } from "@/lib/data";
 import { AnimateIn } from "@/components/layout/AnimateIn";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import {
+  IconPousse,
+  IconConfiance,
+  IconGlobe,
+  IconCoeur,
+} from "@/components/ui/Illustrations";
 import Image from "next/image";
 
 const equipe = [
@@ -40,22 +46,22 @@ const equipe = [
 
 const valeurs = [
   {
-    icon: "🌱",
+    Icon: IconPousse,
     titre: "Fraîcheur",
     desc: "Chaque produit est sélectionné avec rigueur chez nos producteurs.",
   },
   {
-    icon: "🤝",
+    Icon: IconConfiance,
     titre: "Confiance",
     desc: "Nous travaillons depuis de nombreuses années avec des producteurs passionnés.",
   },
   {
-    icon: "🌍",
+    Icon: IconGlobe,
     titre: "Engagement",
     desc: "Produits de saison, circuits courts et emballages réduits au maximum.",
   },
   {
-    icon: "❤️",
+    Icon: IconCoeur,
     titre: "Passion",
     desc: "Le goût et la qualité sont au cœur de chaque décision que nous prenons.",
   },
@@ -110,8 +116,8 @@ export default function APropos() {
           {valeurs.map((v, i) => (
             <AnimateIn key={v.titre} delay={i * 0.1} direction="up">
               <div className="bg-white rounded-3xl p-6 md:p-8 border border-creme-dark h-full">
-                <div className="text-3xl md:text-4xl mb-4 md:mb-5">
-                  {v.icon}
+                <div className="mb-4 md:mb-5 w-12 h-12 rounded-2xl bg-creme flex items-center justify-center text-vert">
+                  <v.Icon className="w-7 h-7" />
                 </div>
                 <h3 className="font-display text-lg md:text-xl text-vert mb-2 md:mb-3">
                   {v.titre}
