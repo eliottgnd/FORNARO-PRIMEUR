@@ -9,6 +9,7 @@ import { useCartStore } from '@/store/useCartStore'
 import { useToast } from '@/components/providers/ToastProvider'
 import { calculateDiscount } from '@/lib/price-utils'
 import { getProductImage } from '@/lib/product-image-utils'
+import { getMinQuantity } from '@/lib/unit-utils'
 import Image from 'next/image'
 
 export default function Favoris() {
@@ -61,7 +62,7 @@ export default function Favoris() {
       categorie: product.category,
       promotions: product.promotions || [],
     }
-    const result = addItem(productForCart)
+    const result = addItem(productForCart, getMinQuantity(product.unit))
     if (result.alreadyExists) {
       showToast('Produit déjà ajouté au panier', 'info')
     } else {

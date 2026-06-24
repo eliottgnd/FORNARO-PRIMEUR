@@ -407,6 +407,10 @@ export default function Promotions() {
                   body: JSON.stringify(conseil),
                 })
                 if (!res.ok) throw new Error()
+                await fetchAll()
+                alert('Conseil du primeur mis à jour !')
+              } catch {
+                alert("Une erreur est survenue lors de l'enregistrement du conseil")
               } finally {
                 setConseilSaving(false)
               }

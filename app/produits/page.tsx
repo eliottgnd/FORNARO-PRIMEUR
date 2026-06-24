@@ -5,11 +5,12 @@ import Link from 'next/link'
 import { categories } from '@/lib/data'
 import { Badge } from '@/components/ui/Badge'
 import { AnimateIn } from '@/components/layout/AnimateIn'
-import { Search, SlidersHorizontal, X, Check, Loader2, MapPin } from 'lucide-react'
+import { Search, SlidersHorizontal, X, Check, Loader2, MapPin, Tag } from 'lucide-react'
 import { useCartStore } from '@/store/useCartStore'
 import { useToast } from '@/components/providers/ToastProvider'
 import { calculateDiscount } from '@/lib/price-utils'
 import { getProductImage } from '@/lib/product-image-utils'
+import { getMinQuantity } from '@/lib/unit-utils'
 import Image from 'next/image'
 
 export default function Produits() {
@@ -18,10 +19,28 @@ export default function Produits() {
   const { showToast } = useToast()
   const [isLoading, setIsLoading] = useState(true)
   const [categorieActive, setCategorieActive] = useState<string>('tous')
+  const [promoActive, setPromoActive]         = useState(false)
   const [recherche, setRecherche]             = useState('')
   const [drawerOuvert, setDrawerOuvert]       = useState(false)
   const [cityFilter, setCityFilter]           = useState('')
   const [deliveryCities, setDeliveryCities]    = useState<string[]>([])
+  const [conseil, setConseil] = useState({ emoji: '💬', titre: 'Le conseil du primeur', texte: 'Les fraises sont particulièrement sucrées cette semaine. Parfaites pour un dessert ou un smoothie frais !' })
+
+  // Pré-sélection de la catégorie / du filtre promo depuis l'URL
+  // (ex: /produits?categorie=fruits ou /produits?promo=1)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const cat = params.get('categorie')
+    if (cat) setCategorieActive(cat)
+    if (params.has('promo')) setPromoActive(true)
+  }, [])
+
+  useEffect(() => {
+    fetch('/api/conseil')
+      .then((r) => r.json())
+      .then((data) => setConseil(data))
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     async function fetchDeliveryCities() {
@@ -67,17 +86,21 @@ export default function Produits() {
     fetchProducts()
   }, [cityFilter])
 
-  const produitsFiltres = produits.filter((p) => {
-    const matchCat    = categorieActive === 'tous' || p.categorie === categorieActive
-    const matchSearch = p.nom.toLowerCase().includes(recherche.toLowerCase())
-    return matchCat && matchSearch
-  })
+  const produitsFiltres = produits
+    .filter((p) => {
+      const matchCat    = categorieActive === 'tous' || p.categorie === categorieActive
+      const matchSearch = p.nom.toLowerCase().includes(recherche.toLowerCase())
+      const matchPromo  = !promoActive || (Array.isArray(p.promotions) && p.promotions.length > 0)
+      return matchCat && matchSearch && matchPromo
+    })
+    .sort((a, b) => a.nom.localeCompare(b.nom, 'fr', { sensitivity: 'base' }))
 
-  const nbFiltresActifs = (categorieActive !== 'tous' ? 1 : 0) + (cityFilter ? 1 : 0)
+  const nbFiltresActifs = (categorieActive !== 'tous' ? 1 : 0) + (cityFilter ? 1 : 0) + (promoActive ? 1 : 0)
 
   const resetFiltres = () => {
     setCategorieActive('tous')
     setCityFilter('')
+    setPromoActive(false)
     setDrawerOuvert(false)
   }
 
@@ -174,6 +197,17 @@ export default function Produits() {
                   {cat.emoji} {cat.label}
                 </button>
               ))}
+              <span className="w-px self-stretch bg-creme-dark mx-1" />
+              <button
+                onClick={() => setPromoActive((v) => !v)}
+                className={`px-5 py-2 rounded-full text-[13px] border transition-all flex items-center gap-1.5 ${
+                  promoActive
+                    ? 'bg-matcha text-white border-matcha'
+                    : 'bg-white text-gris border-creme-dark hover:border-matcha hover:text-matcha'
+                }`}
+              >
+                <Tag size={13} /> Promotions
+              </button>
             </div>
           </AnimateIn>
         </div>
@@ -194,6 +228,15 @@ export default function Produits() {
                 <MapPin size={10} />
                 {cityFilter}
                 <button onClick={() => setCityFilter('')}>
+                  <X size={12} />
+                </button>
+              </span>
+            )}
+            {promoActive && (
+              <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-matcha text-white text-[12px] font-medium">
+                <Tag size={10} />
+                Promotions
+                <button onClick={() => setPromoActive(false)}>
                   <X size={12} />
                 </button>
               </span>
@@ -278,7 +321,7 @@ export default function Produits() {
                       <button
                         onClick={(e) => {
                           e.preventDefault()
-                          const result = addItem(p)
+                          const result = addItem(p, getMinQuantity(p.unite))
                           if (result.alreadyExists) {
                             showToast('Produit déjà ajouté au panier', 'info')
                           } else {
@@ -302,13 +345,13 @@ export default function Produits() {
       <div className="px-6 md:px-20 pb-16 md:pb-20">
         <AnimateIn>
           <div className="bg-vert rounded-3xl px-6 md:px-8 py-5 md:py-6 flex items-center gap-4 md:gap-5">
-            <span className="text-3xl md:text-4xl">💬</span>
+            <span className="text-3xl md:text-4xl">{conseil.emoji}</span>
             <div>
               <p className="text-[10px] md:text-[11px] font-semibold uppercase tracking-widest text-matcha-light">
-                Le conseil du primeur
+                {conseil.titre}
               </p>
               <p className="text-creme text-[13px] md:text-[14px] mt-1 leading-relaxed">
-                Les fraises sont particulierement sucrees cette semaine. Parfaites pour un dessert ou un smoothie frais !
+                {conseil.texte}
               </p>
             </div>
           </div>
@@ -366,6 +409,24 @@ export default function Produits() {
                   </button>
                 ))}
               </div>
+            </div>
+
+            <div className="mb-6">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-gris mb-3">
+                Offres
+              </p>
+              <button
+                onClick={() => setPromoActive((v) => !v)}
+                className={`flex items-center gap-2 px-4 py-3 rounded-2xl text-[13px] font-medium border transition-all w-full ${
+                  promoActive
+                    ? 'bg-matcha text-white border-matcha'
+                    : 'bg-white text-gris border-creme-dark'
+                }`}
+              >
+                <Tag size={14} />
+                <span>Promotions uniquement</span>
+                {promoActive && <Check size={14} className="ml-auto" />}
+              </button>
             </div>
 
             <div className="mb-8">
