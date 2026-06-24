@@ -8,6 +8,8 @@ import { categories, marches } from "@/lib/data";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { AnimateIn } from "@/components/layout/AnimateIn";
 import { AuthModal } from "@/components/ui/AuthModal";
+import { calculateDiscount } from "@/lib/price-utils";
+import { getProductImage } from "@/lib/product-image-utils";
 import Image from "next/image";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -22,6 +24,7 @@ export default function Home() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [zones, setZones] = useState<string[]>([]);
   const [conseil, setConseil] = useState({ emoji: '🍓', titre: 'Le conseil du primeur', texte: 'Les fraises sont particulièrement sucrées cette semaine.' });
+  const [promoProducts, setPromoProducts] = useState<any[]>([]);
 
   useEffect(() => {
     fetch("/api/delivery-settings")
@@ -31,6 +34,16 @@ export default function Home() {
     fetch("/api/conseil")
       .then((r) => r.json())
       .then((data) => setConseil(data))
+      .catch(() => {});
+    fetch("/api/products")
+      .then((r) => r.json())
+      .then((data) =>
+        setPromoProducts(
+          (Array.isArray(data) ? data : []).filter(
+            (p: any) => Array.isArray(p.promotions) && p.promotions.length > 0,
+          ),
+        ),
+      )
       .catch(() => {});
   }, []);
 
@@ -407,7 +420,7 @@ export default function Home() {
             title="Promotions"
             action={
               <Link
-                href="/produits"
+                href="/produits?promo=1"
                 className="text-[13px] text-creme/50 hover:text-creme"
               >
                 Voir tout
@@ -415,39 +428,102 @@ export default function Home() {
             }
           />
         </AnimateIn>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5 mt-4">
-          {[
-            {
-              emoji: "🍓",
-              titre: "Produits en promotion !",
-              desc: "Ne passez pas a côté de nos offres fraîches de la semaine.",
-              tag: "Découvrir",
-            },
-            {
-              emoji: "🥗",
-              titre: "Panier de saison",
-              desc: "Composez votre panier avec nos produits de saison.",
-              tag: "Offre limitee",
-            },
-          ].map((promo, i) => (
-            <AnimateIn key={promo.titre} delay={i * 0.15} direction="up">
-              <div className="bg-white/5 border border-white/10 rounded-3xl p-6 md:p-8 flex items-center gap-4 md:gap-6">
-                <span className="text-4xl md:text-5xl">{promo.emoji}</span>
-                <div>
-                  <p className="font-display text-lg md:text-xl text-creme">
-                    {promo.titre}
-                  </p>
-                  <p className="text-[12px] md:text-[13px] text-creme/60 mt-2 leading-relaxed">
-                    {promo.desc}
-                  </p>
-                  <span className="inline-block mt-3 bg-matcha text-white text-[12px] font-bold px-3 py-1 rounded-full">
-                    {promo.tag}
-                  </span>
-                </div>
-              </div>
-            </AnimateIn>
-          ))}
-        </div>
+
+        {promoProducts.length > 0 ? (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5 mt-4">
+            {promoProducts.slice(0, 4).map((p, i) => {
+              const {
+                originalPrice,
+                discountedPrice,
+                hasPromotion,
+                discountPercent,
+                promotionType,
+                promotion,
+              } = calculateDiscount(p);
+              const label =
+                promotionType === "bundle"
+                  ? `${promotion.bundleQuantity} pour ${promotion.bundlePrice}€`
+                  : promotionType === "fixed"
+                    ? `-${promotion.discountAmount}€`
+                    : `-${discountPercent}%`;
+              return (
+                <AnimateIn key={p.id} delay={i * 0.1} direction="up">
+                  <Link href={`/produits/${p.id}`}>
+                    <div className="bg-white/5 border border-white/10 rounded-3xl overflow-hidden hover:scale-[1.02] transition-transform cursor-pointer h-full">
+                      <div className="aspect-square relative overflow-hidden bg-white/5">
+                        <Image
+                          src={getProductImage(p)}
+                          alt={p.name}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 1024px) 50vw, 25vw"
+                        />
+                        <span className="absolute top-2 right-2 bg-matcha text-white text-[11px] font-bold px-2 py-0.5 rounded-full">
+                          {label}
+                        </span>
+                      </div>
+                      <div className="p-4">
+                        <p className="font-display text-base md:text-lg text-creme">
+                          {p.name}
+                        </p>
+                        <div className="flex items-center gap-2 mt-1">
+                          {hasPromotion && promotionType !== "bundle" && (
+                            <span className="text-[12px] text-creme/40 line-through">
+                              {originalPrice.toFixed(2)}€
+                            </span>
+                          )}
+                          <span className="font-display text-lg text-matcha-light">
+                            {discountedPrice.toFixed(2)}€
+                            <span className="text-[11px] font-body text-creme/50">
+                              {" "}
+                              /{p.unit}
+                            </span>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                </AnimateIn>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5 mt-4">
+            {[
+              {
+                emoji: "🍓",
+                titre: "Produits en promotion !",
+                desc: "Ne passez pas a côté de nos offres fraîches de la semaine.",
+                tag: "Découvrir",
+              },
+              {
+                emoji: "🥗",
+                titre: "Panier de saison",
+                desc: "Composez votre panier avec nos produits de saison.",
+                tag: "Offre limitee",
+              },
+            ].map((promo, i) => (
+              <AnimateIn key={promo.titre} delay={i * 0.15} direction="up">
+                <Link href="/produits">
+                  <div className="bg-white/5 border border-white/10 rounded-3xl p-6 md:p-8 flex items-center gap-4 md:gap-6 hover:scale-[1.01] transition-transform cursor-pointer">
+                    <span className="text-4xl md:text-5xl">{promo.emoji}</span>
+                    <div>
+                      <p className="font-display text-lg md:text-xl text-creme">
+                        {promo.titre}
+                      </p>
+                      <p className="text-[12px] md:text-[13px] text-creme/60 mt-2 leading-relaxed">
+                        {promo.desc}
+                      </p>
+                      <span className="inline-block mt-3 bg-matcha text-white text-[12px] font-bold px-3 py-1 rounded-full">
+                        {promo.tag}
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              </AnimateIn>
+            ))}
+          </div>
+        )}
       </section>
     </>
   );

@@ -5,6 +5,8 @@ import { AnimateIn } from '@/components/layout/AnimateIn'
 import { Search, Pencil, Plus, Loader2, X, Trash2, Package } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { getProductImagePreview, getProductImage } from '@/lib/product-image-utils'
+import { categories } from '@/lib/data'
+import { PRODUCT_UNITS } from '@/lib/unit-utils'
 
 interface Product {
   id: string
@@ -24,6 +26,7 @@ export default function Stocks() {
   const [produits, setProduits] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [recherche, setRecherche] = useState<string>('')
+  const [categorieFiltre, setCategorieFiltre] = useState<string>('tous')
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [saveLoading, setSaveLoading] = useState<boolean>(false)
@@ -33,6 +36,7 @@ export default function Stocks() {
   const [loadingCities, setLoadingCities] = useState<boolean>(true)
   const [uploadingImage, setUploadingImage] = useState<boolean>(false)
   const [currentImage, setCurrentImage] = useState<string | undefined>(undefined)
+  const [unitValue, setUnitValue] = useState<string>('kg')
 
   const fetchProduits = async () => {
     setIsLoading(true)
@@ -153,6 +157,7 @@ export default function Stocks() {
     setEditingProduct(product)
     setSelectedCities(product.availabilities?.map(a => a.city) || [])
     setCurrentImage(product.image)
+    setUnitValue(product.unit || 'kg')
     setIsModalOpen(true)
   }
 
@@ -160,6 +165,7 @@ export default function Stocks() {
     setEditingProduct(null)
     setSelectedCities([])
     setCurrentImage(undefined)
+    setUnitValue('kg')
     setIsModalOpen(true)
   }
 
@@ -200,9 +206,13 @@ export default function Stocks() {
     setSelectedCities(prev => prev.filter(c => c !== city))
   }
 
-  const produitsFiltres = produits.filter((p) =>
-    p.name.toLowerCase().includes(recherche.toLowerCase())
-  )
+  const produitsFiltres = produits
+    .filter((p) => {
+      const matchSearch = p.name.toLowerCase().includes(recherche.toLowerCase())
+      const matchCat = categorieFiltre === 'tous' || p.category === categorieFiltre
+      return matchSearch && matchCat
+    })
+    .sort((a, b) => a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }))
 
   return (
     <div className="relative">
@@ -235,6 +245,37 @@ export default function Stocks() {
         </div>
       </AnimateIn>
 
+      <AnimateIn delay={0.12}>
+        <div className="flex gap-2 mb-6 flex-wrap">
+          <button
+            onClick={() => setCategorieFiltre('tous')}
+            className={`px-4 py-1.5 rounded-full text-[12px] border transition-all ${
+              categorieFiltre === 'tous'
+                ? 'bg-vert text-white border-vert'
+                : 'bg-white text-gris border-creme-dark hover:border-vert hover:text-vert'
+            }`}
+          >
+            Tous ({produits.length})
+          </button>
+          {categories.map((cat) => {
+            const count = produits.filter((p) => p.category === cat.id).length
+            return (
+              <button
+                key={cat.id}
+                onClick={() => setCategorieFiltre(cat.id)}
+                className={`px-4 py-1.5 rounded-full text-[12px] border transition-all ${
+                  categorieFiltre === cat.id
+                    ? 'bg-vert text-white border-vert'
+                    : 'bg-white text-gris border-creme-dark hover:border-vert hover:text-vert'
+                }`}
+              >
+                {cat.emoji} {cat.label} ({count})
+              </button>
+            )
+          })}
+        </div>
+      </AnimateIn>
+
       <AnimateIn delay={0.15}>
         <div className="bg-white rounded-3xl border border-creme-dark overflow-hidden">
           {isLoading ? (
@@ -252,13 +293,13 @@ export default function Stocks() {
                 ))}
               </div>
 
-              <div className="divide-y divide-creme max-h-[400px] overflow-y-auto">
+              <div className="divide-y divide-creme max-h-[70vh] overflow-y-auto">
                 {produitsFiltres.length === 0 ? (
                   <div className="py-12 text-center text-gris text-sm">
-                    {recherche ? 'Aucun produit trouvé.' : 'Aucun produit en stock.'}
+                    {recherche || categorieFiltre !== 'tous' ? 'Aucun produit trouvé.' : 'Aucun produit en stock.'}
                   </div>
                 ) : (
-                  produitsFiltres.slice(0, 10).map((p) => (
+                  produitsFiltres.map((p) => (
                     <div key={p.id}>
                       <div className="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr_80px] px-6 py-3 items-center hover:bg-creme/40 transition-colors">
                         <div className="flex items-center gap-3">
@@ -456,8 +497,21 @@ export default function Stocks() {
                     <input name="price" type="number" step="0.01" defaultValue={editingProduct?.price || ''} required className="input-field w-full" placeholder="0.00" />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[12px] font-medium text-texte">Unité</label>
-                    <input name="unit" defaultValue={editingProduct?.unit || 'kg'} required className="input-field w-full" placeholder="kg, botte..." />
+                    <label className="text-[12px] font-medium text-texte">Unité de mesure</label>
+                    <select
+                      name="unit"
+                      value={unitValue}
+                      onChange={(e) => setUnitValue(e.target.value)}
+                      required
+                      className="input-field w-full"
+                    >
+                      {unitValue && !PRODUCT_UNITS.includes(unitValue as (typeof PRODUCT_UNITS)[number]) && (
+                        <option value={unitValue}>{unitValue}</option>
+                      )}
+                      {PRODUCT_UNITS.map((u) => (
+                        <option key={u} value={u}>{u}</option>
+                      ))}
+                    </select>
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-[12px] font-medium text-texte">Stock</label>

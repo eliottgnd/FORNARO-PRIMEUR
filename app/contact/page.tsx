@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { marches } from "@/lib/data";
 import { AnimateIn } from "@/components/layout/AnimateIn";
 import { Send, MapPin, Clock, Phone, Mail } from "lucide-react";
@@ -211,20 +212,33 @@ export default function Contact() {
             {marches.map((m) => (
               <div
                 key={m.id}
-                className="flex items-start gap-3 md:gap-4 bg-creme rounded-2xl p-4 md:p-5 border border-creme-dark"
+                className="bg-creme rounded-2xl border border-creme-dark overflow-hidden"
               >
-                <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-white flex items-center justify-center text-matcha border border-creme-dark shrink-0">
-                  <MapPin size={17} />
-                </div>
-                <div>
-                  <p className="text-[13px] md:text-[14px] font-semibold text-vert">
-                    {m.nom}
-                  </p>
-                  <p className="text-[12px] md:text-[13px] text-gris mt-0.5 leading-relaxed">
-                    {m.adresse}
-                    <br />
-                    {m.ville}
-                  </p>
+                {m.image && (
+                  <div className="relative h-36 md:h-44 w-full overflow-hidden">
+                    <Image
+                      src={m.image}
+                      alt={m.nom}
+                      fill
+                      className="object-cover"
+                      style={{ objectPosition: "50% 75%" }}
+                    />
+                  </div>
+                )}
+                <div className="flex items-start gap-3 md:gap-4 p-4 md:p-5">
+                  <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-white flex items-center justify-center text-matcha border border-creme-dark shrink-0">
+                    <MapPin size={17} />
+                  </div>
+                  <div>
+                    <p className="text-[13px] md:text-[14px] font-semibold text-vert">
+                      {m.nom}
+                    </p>
+                    <p className="text-[12px] md:text-[13px] text-gris mt-0.5 leading-relaxed">
+                      {m.adresse}
+                      <br />
+                      {m.ville}
+                    </p>
+                  </div>
                 </div>
               </div>
             ))}

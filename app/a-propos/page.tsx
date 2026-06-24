@@ -22,13 +22,6 @@ const equipe = [
     image: "/images/staff/audrey.jpg", // ← mettre le chemin ici
   },
   {
-    prenom: "Frédéric",
-    nom: "",
-    role: "",
-    emoji: "🔍",
-    image: "/images/staff/frederic.jpg", // ← mettre le chemin ici
-  },
-  {
     prenom: "Léa",
     nom: "",
     role: "",

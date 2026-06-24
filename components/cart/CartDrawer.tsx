@@ -5,6 +5,7 @@ import { useCartStore } from "@/store/useCartStore";
 import { ShoppingBag, X, Plus, Minus, ArrowRight, Trash2, AlertCircle, Truck } from "lucide-react";
 import Link from "next/link";
 import { clsx } from "clsx";
+import { getQuantityStep } from "@/lib/unit-utils";
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -123,24 +124,25 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                   <div className="flex items-center gap-3 mt-2">
                     <div className="flex items-center gap-2 bg-creme rounded-lg px-2 py-1">
                       <button
-                        onClick={() =>
-                          item.quantity > 0.5 &&
-                          updateQuantity(item.productId, item.quantity - 0.5)
-                        }
+                        onClick={() => {
+                          const step = getQuantityStep(item.unit)
+                          item.quantity > step &&
+                            updateQuantity(item.productId, +(item.quantity - step).toFixed(2))
+                        }}
                         className={clsx(
                           "p-1 hover:text-vert transition-colors",
-                          item.quantity <= 0.5 &&
+                          item.quantity <= getQuantityStep(item.unit) &&
                             "opacity-50 cursor-not-allowed hover:text-vert-mid",
                         )}
                       >
                         <Minus size={12} />
                       </button>
-                      <span className="text-xs font-medium w-4 text-center">
+                      <span className="text-xs font-medium min-w-[1.5rem] text-center">
                         {item.quantity}
                       </span>
                       <button
                         onClick={() =>
-                          updateQuantity(item.productId, item.quantity + 0.5)
+                          updateQuantity(item.productId, +(item.quantity + getQuantityStep(item.unit)).toFixed(2))
                         }
                         className="p-1 hover:text-vert transition-colors"
                       >

@@ -12,6 +12,7 @@ import { useSession } from 'next-auth/react'
 import { useToast } from '@/components/providers/ToastProvider'
 import { calculateDiscount } from '@/lib/price-utils'
 import { getProductImage } from '@/lib/product-image-utils'
+import { getQuantityStep, getMinQuantity } from '@/lib/unit-utils'
 import Image from 'next/image'
 
 interface Product {
@@ -50,6 +51,7 @@ export default function FicheProduit() {
         if (res.ok) {
           const data = await res.json()
           setProduit(data)
+          setQuantite(getMinQuantity(data.unit))
           setIsFavorited(useFavoritesStore.getState().isFavorite(data.id))
 
           // Fetch related products after we have the product data
@@ -262,14 +264,20 @@ export default function FicheProduit() {
             <div className="flex items-center gap-3 mb-4 md:mb-6">
               <div className="flex items-center gap-2 md:gap-3 bg-creme rounded-2xl px-3 md:px-4 py-2.5 md:py-3 border border-creme-dark">
                 <button
-                  onClick={() => setQuantite(Math.max(0.5, quantite - 0.5))}
+                  onClick={() => {
+                    const step = getQuantityStep(produit.unit)
+                    setQuantite(Math.max(getMinQuantity(produit.unit), +(quantite - step).toFixed(2)))
+                  }}
                   className="w-7 h-7 rounded-full bg-white border border-creme-dark text-vert font-semibold hover:bg-vert hover:text-white transition-colors grid place-items-center"
                 >
                   -
                 </button>
-                <span className="font-display text-xl text-vert w-5 text-center">{quantite}</span>
+                <span className="font-display text-xl text-vert min-w-[2.5rem] text-center">{quantite}</span>
                 <button
-                  onClick={() => setQuantite(quantite + 0.5)}
+                  onClick={() => {
+                    const step = getQuantityStep(produit.unit)
+                    setQuantite(+(quantite + step).toFixed(2))
+                  }}
                   className="w-7 h-7 rounded-full bg-white border border-creme-dark text-vert font-semibold hover:bg-vert hover:text-white transition-colors grid place-items-center"
                 >
                   +
@@ -375,7 +383,7 @@ export default function FicheProduit() {
                             categorie: p.category,
                             promotions: p.promotions || [],
                           }
-                          const result = addItem(productForCart, 1)
+                          const result = addItem(productForCart, getMinQuantity(p.unit))
                           if (result.alreadyExists) {
                             showToast('Produit déjà ajouté au panier', 'info')
                           } else {

@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { getProductImage } from "@/lib/product-image-utils";
+import { getQuantityStep } from "@/lib/unit-utils";
 import { useToast } from "@/components/providers/ToastProvider";
 
 export default function PanierPage() {
@@ -296,21 +297,21 @@ export default function PanierPage() {
                   onClick={() =>
                     useCartStore
                       .getState()
-                      .updateQuantity(item.productId, item.quantity - 0.5)
+                      .updateQuantity(item.productId, +(item.quantity - getQuantityStep(item.unit)).toFixed(2))
                   }
                   className="text-vert hover:text-vert-mid font-bold"
                 >
                   {" "}
                   -{" "}
                 </button>
-                <span className="font-display font-semibold text-vert w-4 text-center">
+                <span className="font-display font-semibold text-vert min-w-[2rem] text-center">
                   {item.quantity}
                 </span>
                 <button
                   onClick={() =>
                     useCartStore
                       .getState()
-                      .updateQuantity(item.productId, item.quantity + 0.5)
+                      .updateQuantity(item.productId, +(item.quantity + getQuantityStep(item.unit)).toFixed(2))
                   }
                   className="text-vert hover:text-vert-mid font-bold"
                 >
