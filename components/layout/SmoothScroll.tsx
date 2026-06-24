@@ -14,9 +14,14 @@ declare global {
 }
 
 function isScrollable(element: HTMLElement | null): boolean {
-  if (!element) return false
-  if (element.classList.contains('overflow-y-auto') || element.classList.contains('overflow-y-scroll')) {
-    return element.scrollHeight > element.clientHeight + 1
+  if (!element || element === document.body || element === document.documentElement) return false
+  const style = window.getComputedStyle(element)
+  const overflowY = style.overflowY
+  if (
+    (overflowY === 'auto' || overflowY === 'scroll') &&
+    element.scrollHeight > element.clientHeight + 1
+  ) {
+    return true
   }
   return isScrollable(element.parentElement)
 }
@@ -66,13 +71,11 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
 
       lenis.on('scroll', ScrollTrigger.update)
 
-      // Skip wheel/touch isolation on /admin/promotions page
-      const isPromotionsPage = () => window.location.pathname === '/admin/promotions'
-
       // Stop wheel events from scrollable containers before Lenis processes them
+      // so native inner scroll (admin dashboard, drawers, modals…) works.
       const handleWheel = (e: WheelEvent) => {
         const target = e.target as HTMLElement | null
-        if (!target || isPromotionsPage()) return
+        if (!target) return
         if (isScrollable(target)) {
           e.stopImmediatePropagation()
         }
@@ -80,7 +83,7 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
 
       const handleTouchStart = (e: TouchEvent) => {
         const target = e.target as HTMLElement | null
-        if (!target || isPromotionsPage()) return
+        if (!target) return
         if (isScrollable(target)) {
           if (lenisRef.current) {
             lenisRef.current.stop()
