@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/auth/prisma";
 
+export const dynamic = "force-dynamic";
+
+const NO_STORE_HEADERS = { "Cache-Control": "no-store, max-age=0" };
+
 export async function GET() {
   try {
     const now = new Date();
@@ -29,7 +33,7 @@ export async function GET() {
       remaining: slot.maxCapacity - slot._count.orders,
     })).filter((s) => s.remaining > 0);
 
-    return NextResponse.json(result);
+    return NextResponse.json(result, { headers: NO_STORE_HEADERS });
   } catch (error) {
     console.error("GET_DELIVERY_SLOTS_ERROR:", error);
     return NextResponse.json({ message: "Internal server error" }, { status: 500 });

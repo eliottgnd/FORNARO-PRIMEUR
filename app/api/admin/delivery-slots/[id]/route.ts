@@ -3,6 +3,11 @@ import { prisma } from "@/lib/auth/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
+function parseDeliveryDate(date: string) {
+  const [year, month, day] = date.split("T")[0].split("-").map(Number);
+  return new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+}
+
 async function checkAdmin() {
   const session = await getServerSession(authOptions);
   return session?.user.role === "ADMIN";
@@ -19,7 +24,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (body.isActive !== undefined) data.isActive = body.isActive;
     if (body.maxCapacity !== undefined) data.maxCapacity = parseInt(body.maxCapacity);
     if (body.label !== undefined) data.label = body.label || null;
-    if (body.date !== undefined) data.date = new Date(body.date);
+    if (body.date !== undefined) data.date = parseDeliveryDate(body.date);
 
     const slot = await prisma.deliverySlot.update({ where: { id }, data });
     return NextResponse.json(slot);
