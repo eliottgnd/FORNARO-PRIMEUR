@@ -17,21 +17,30 @@ interface Slot {
 const JOURS = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']
 const MOIS = ['jan.', 'fév.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sep.', 'oct.', 'nov.', 'déc.']
 
+function getDateParts(iso: string) {
+  const datePart = iso.split('T')[0]
+  const [year, month, day] = datePart.split('-').map(Number)
+  return { year, month, day, date: new Date(year, month - 1, day) }
+}
+
 function formatDate(iso: string) {
-  const d = new Date(iso)
-  return `${JOURS[d.getDay()]} ${d.getDate()} ${MOIS[d.getMonth()]} ${d.getFullYear()}`
+  const { date, year, month, day } = getDateParts(iso)
+  return `${JOURS[date.getDay()]} ${day} ${MOIS[month - 1]} ${year}`
+}
+
+function getLocalDateKey(date = new Date()) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
 }
 
 function isToday(iso: string) {
-  const d = new Date(iso)
-  const t = new Date()
-  return d.getDate() === t.getDate() && d.getMonth() === t.getMonth() && d.getFullYear() === t.getFullYear()
+  return iso.split('T')[0] === getLocalDateKey()
 }
 
 function isPast(iso: string) {
-  const d = new Date(iso)
-  d.setHours(23, 59, 59)
-  return d < new Date()
+  return iso.split('T')[0] < getLocalDateKey()
 }
 
 export default function Creneaux() {
@@ -44,7 +53,7 @@ export default function Creneaux() {
   const fetchSlots = async () => {
     setIsLoading(true)
     try {
-      const res = await fetch('/api/admin/delivery-slots')
+      const res = await fetch('/api/admin/delivery-slots', { cache: 'no-store' })
       if (res.ok) setSlots(await res.json())
     } finally {
       setIsLoading(false)
@@ -140,12 +149,11 @@ export default function Creneaux() {
               </div>
             ) : (
               <div className="space-y-3 mb-8">
-                {upcoming.map((slot, i) => {
+                {upcoming.map((slot) => {
                   const pct = Math.round((slot.booked / slot.maxCapacity) * 100)
                   return (
-                    <AnimateIn key={slot.id} delay={i * 0.04}>
-                      <div className={`bg-white rounded-2xl border p-4 md:p-5 flex flex-col sm:flex-row sm:items-center gap-4 ${slot.isActive ? 'border-creme-dark' : 'border-creme-dark opacity-60'}`}>
-                        {/* Date + label */}
+                    <div key={slot.id} className={`bg-white rounded-2xl border p-4 md:p-5 flex flex-col sm:flex-row sm:items-center gap-4 ${slot.isActive ? 'border-creme-dark' : 'border-creme-dark opacity-60'}`}>
+                      {/* Date + label */}
                         <div className="flex items-center gap-3 flex-1">
                           <div className="w-10 h-10 rounded-xl bg-creme flex items-center justify-center shrink-0">
                             <CalendarDays size={18} className="text-matcha" />
@@ -153,7 +161,7 @@ export default function Creneaux() {
                           <div>
                             <p className="font-medium text-vert text-[14px]">
                               {formatDate(slot.date)}
-                              {isToday(slot.date) && <span className="ml-2 text-[10px] bg-matcha text-white px-1.5 py-0.5 rounded-full font-normal">Aujourd'hui</span>}
+                              {isToday(slot.date) && <span className="ml-2 text-[10px] bg-matcha text-white px-1.5 py-0.5 rounded-full font-normal">Aujourd’hui</span>}
                             </p>
                             {slot.label && <p className="text-[11px] text-gris">{slot.label}</p>}
                           </div>
@@ -199,8 +207,7 @@ export default function Creneaux() {
                         <button onClick={() => deleteSlot(slot)} className="shrink-0 text-gris hover:text-red-500 transition-colors p-1" title="Supprimer">
                           <Trash2 size={15} />
                         </button>
-                      </div>
-                    </AnimateIn>
+                    </div>
                   )
                 })}
               </div>
