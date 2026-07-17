@@ -74,3 +74,83 @@ body {
            focus:border-matcha transition-all;
   }
 }
+@layer components {
+  .maintenance-screen {
+    @apply relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-blanc px-5 py-10 text-center;
+  }
+
+  .maintenance-screen::before {
+    content: '';
+    @apply absolute inset-0 -z-20;
+    background:
+      radial-gradient(circle at 50% 18%, rgb(168 197 160 / 0.28), transparent 30rem),
+      linear-gradient(135deg, rgb(245 240 232 / 0.92), rgb(253 250 244));
+  }
+
+  .maintenance-screen::after {
+    content: '';
+    @apply absolute inset-0 -z-10 opacity-40;
+    background-image:
+      linear-gradient(rgb(30 58 40 / 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(30 58 40 / 0.08) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(circle at center, black, transparent 72%);
+  }
+
+  .maintenance-glow {
+    @apply absolute -z-10 h-72 w-72 rounded-full blur-3xl;
+    animation: maintenance-float 7s ease-in-out infinite;
+  }
+
+  .maintenance-glow--left {
+    @apply -left-24 top-16 bg-matcha-light/45;
+  }
+
+  .maintenance-glow--right {
+    @apply -right-24 bottom-12 bg-creme-dark/90;
+    animation-delay: -3s;
+  }
+
+  .maintenance-card {
+    @apply relative w-full max-w-3xl overflow-hidden rounded-[2rem] border border-white/70 bg-white/75 px-6 py-12 shadow-2xl shadow-vert/10 backdrop-blur md:px-14 md:py-16;
+  }
+
+  .maintenance-card::before {
+    content: '';
+    @apply absolute left-8 right-8 top-0 h-px bg-gradient-to-r from-transparent via-matcha/60 to-transparent;
+  }
+
+  .maintenance-signature {
+    @apply mx-auto mb-10 flex min-h-40 w-full max-w-3xl items-center justify-center rounded-[2rem] bg-creme/70 px-4 py-8 text-vert shadow-inner shadow-vert/10 md:px-8;
+  }
+
+  .maintenance-signature svg {
+    filter: drop-shadow(0 18px 28px rgb(30 58 40 / 0.14));
+  }
+
+  .maintenance-signature path {
+    vector-effect: non-scaling-stroke;
+  }
+
+  .maintenance-title {
+    @apply mx-auto mt-4 max-w-2xl font-display text-4xl leading-tight text-vert md:text-6xl;
+  }
+
+  .maintenance-copy {
+    @apply mx-auto mt-5 max-w-2xl text-base leading-7 text-gris md:text-lg;
+  }
+
+  .maintenance-status {
+    @apply mx-auto mt-8 inline-flex items-center gap-3 rounded-full border border-matcha/20 bg-creme px-5 py-3 text-sm font-semibold text-vert;
+  }
+
+  .maintenance-status span {
+    @apply h-2.5 w-2.5 rounded-full bg-matcha;
+    animation: pulseDot 1.6s ease-in-out infinite;
+  }
+}
+
+@keyframes maintenance-float {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(18px, -18px, 0) scale(1.08); }
+}
