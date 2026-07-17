@@ -9,6 +9,9 @@ import { BanniereProvider } from '@/components/layout/BanniereContext'
 import { BannierePromo } from '@/components/layout/BannierePromo'
 import { AuthProvider } from '@/components/providers/AuthProvider'
 import { ToastProvider } from '@/components/providers/ToastProvider'
+import { MaintenanceScreen } from '@/components/layout/MaintenanceScreen'
+
+const SITE_PAUSED = true
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://fornaroprimeur.fr'),
@@ -28,7 +31,7 @@ export const metadata: Metadata = {
     description: 'Primeur en ligne au Pays Basque. Fruits, légumes et produits frais sélectionnés chaque jour, livrés à domicile à Biarritz, Hendaye et alentours.',
     images: [{ url: '/images/hero-bg.jpg', width: 1200, height: 630, alt: 'Fornaro Primeur' }],
   },
-  robots: { index: true, follow: true },
+  robots: SITE_PAUSED ? { index: false, follow: false } : { index: true, follow: true },
   alternates: { canonical: 'https://fornaroprimeur.fr' },
 }
 
@@ -91,6 +94,16 @@ const jsonLd = {
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  if (SITE_PAUSED) {
+    return (
+      <html lang="fr" translate="no" suppressHydrationWarning>
+        <body>
+          <MaintenanceScreen />
+        </body>
+      </html>
+    )
+  }
+
   return (
     <html lang="fr" translate="no" suppressHydrationWarning>
       <head>
