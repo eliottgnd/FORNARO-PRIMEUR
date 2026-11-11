@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
-const SITE_PAUSED = true
+const SITE_PAUSED = false
 
 export function proxy(request: NextRequest) {
   if (!SITE_PAUSED) {
