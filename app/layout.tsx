@@ -10,8 +10,9 @@ import { BannierePromo } from '@/components/layout/BannierePromo'
 import { AuthProvider } from '@/components/providers/AuthProvider'
 import { ToastProvider } from '@/components/providers/ToastProvider'
 import { MaintenanceScreen } from '@/components/layout/MaintenanceScreen'
+import { AnnonceOuverture } from '@/components/layout/AnnonceOuverture'
 
-const SITE_PAUSED = true
+const SITE_PAUSED = false
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://fornaroprimeur.fr'),
@@ -119,6 +120,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Intro />
               <SmoothScroll>
                 <div className="flex flex-col min-h-screen">
+                  <AnnonceOuverture />
                   <BannierePromo />
                   <Navbar />
                   <PageTransition>

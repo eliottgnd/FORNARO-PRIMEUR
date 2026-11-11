@@ -17,11 +17,16 @@ import Link from "next/link";
 import { getProductImage } from "@/lib/product-image-utils";
 import { getQuantityStep } from "@/lib/unit-utils";
 import { useToast } from "@/components/providers/ToastProvider";
+import { areOrdersOpen, ORDERS_CLOSED_MESSAGE, ORDERS_OPENING_LABEL } from "@/lib/orders-opening";
 
 export default function PanierPage() {
   const { items, getTotalPrice, clearCart } = useCartStore()
   const totalPrice = getTotalPrice();
   const [isLoading, setIsLoading] = useState(false);
+  const [ordersOpen, setOrdersOpen] = useState(false);
+  useEffect(() => {
+    setOrdersOpen(areOrdersOpen());
+  }, []);
   const [address, setAddress] = useState<{
     label: string;
     street: string;
@@ -127,6 +132,11 @@ export default function PanierPage() {
       : "";
 
   const handlePlaceOrder = async () => {
+    if (!ordersOpen) {
+      showToast(ORDERS_CLOSED_MESSAGE, "error");
+      return;
+    }
+
     if (!address.street || !address.street.trim()) {
       showToast("Veuillez entrer une adresse", "error");
       return;
@@ -586,6 +596,7 @@ export default function PanierPage() {
           <button
             onClick={handlePlaceOrder}
             disabled={
+              !ordersOpen ||
               isLoading ||
               hasUnavailableItems ||
               (addressMode === "saved" && (!addresses.length || !address.id)) ||
@@ -594,6 +605,7 @@ export default function PanierPage() {
             }
             className={clsx(
               "w-full py-4 rounded-2xl font-semibold transition-all flex items-center justify-center gap-2",
+              !ordersOpen ||
               isLoading ||
               hasUnavailableItems ||
               (addressMode === "saved" && (!addresses.length || !address.id)) ||
@@ -608,7 +620,11 @@ export default function PanierPage() {
             ) : (
               <CreditCard size={18} />
             )}
-            {isLoading ? "Traitement..." : " Passer à paiement"}
+            {isLoading
+              ? "Traitement..."
+              : ordersOpen
+                ? " Passer à paiement"
+                : ` Commandes dès le ${ORDERS_OPENING_LABEL}`}
           </button>
         </div>
       </div>

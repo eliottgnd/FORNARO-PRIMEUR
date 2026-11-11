@@ -2,12 +2,16 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { SumUp } from '@sumup/sdk'
+import { areOrdersOpen, ORDERS_CLOSED_MESSAGE } from '@/lib/orders-opening'
 
 const sumupClient = new SumUp({
   apiKey: process.env.SUMUP_API_KEY || '',
 })
 
 export async function POST(req: NextRequest) {
+  if (!areOrdersOpen()) {
+    return NextResponse.json({ error: ORDERS_CLOSED_MESSAGE }, { status: 403 })
+  }
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Veuillez vous connecter' }, { status: 401 })
