@@ -3,6 +3,7 @@
 import { useBanniere } from './BanniereContext'
 import { X } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import { areOrdersOpen } from '@/lib/orders-opening'
 
 export function BannierePromo() {
   const { banniere, setBanniere } = useBanniere()
@@ -25,7 +26,8 @@ export function BannierePromo() {
     fetchBanner()
   }, [])
 
-  if (!initialized || !banniere.actif) return null
+  // Avant l'ouverture des commandes, seule l'annonce d'ouverture est affichée.
+  if (!initialized || !banniere.actif || !areOrdersOpen()) return null
 
   const bgClass =
     banniere.couleur === 'matcha' ? 'bg-matcha' :
