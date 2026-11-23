@@ -336,9 +336,17 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
         )}
 
         {successMessage && (
-          <div className="mb-4 p-3 text-xs text-white bg-green-600 rounded-lg text-center">
-            {successMessage}
-          </div>
+          <>
+            <div className="mb-3 p-3 text-xs text-white bg-green-600 rounded-lg text-center">
+              {successMessage}
+            </div>
+            <div className="mb-4 p-3 text-xs text-amber-900 bg-amber-50 border border-amber-300 rounded-lg text-center leading-snug">
+              <strong>⚠️ Pensez à vérifier vos spams !</strong>
+              <br />
+              Notre email arrive souvent dans le dossier Spam ou Courrier indésirable.
+              C&apos;est important de le vérifier si vous ne le voyez pas dans votre boîte de réception.
+            </div>
+          </>
         )}
 
         {/* LOGIN FORM */}
@@ -534,7 +542,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 </Button>
 
                 <p className="text-center text-[11px] text-gris mt-3">
-                  Pas reçu de code ?{" "}
+                  Pas reçu de code ? Vérifiez vos spams, sinon{" "}
                   <button onClick={handleSendCode} className="text-matcha hover:underline" disabled={isLoading}>
                     Renvoyer
                   </button>
@@ -585,7 +593,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
             </Button>
 
             <p className="text-center text-[11px] text-gris mt-3">
-              Pas reçu ?{" "}
+              Pas reçu ? Vérifiez vos spams, sinon{" "}
               <button onClick={handleSendCode} className="text-matcha hover:underline" disabled={isLoading}>
                 Renvoyer le code
               </button>
