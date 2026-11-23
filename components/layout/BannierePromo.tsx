@@ -1,6 +1,6 @@
 'use client'
 
-import { useBanniere } from './BanniereContext'
+import { useBanniere, getBanniereTaille } from './BanniereContext'
 import { X } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
@@ -27,6 +27,8 @@ export function BannierePromo() {
 
   if (!initialized || !banniere.actif) return null
 
+  const taille = getBanniereTaille(banniere.taille)
+
   const bgClass =
     banniere.couleur === 'matcha' ? 'bg-matcha' :
     banniere.couleur === 'or'     ? 'bg-or'     :
@@ -36,16 +38,16 @@ export function BannierePromo() {
     banniere.couleur === 'or' ? 'text-vert' : 'text-white'
 
   return (
-    <div className={`sticky top-0 z-[60] ${bgClass} ${textClass} px-6 pr-12 py-2.5 flex items-center justify-center gap-3 min-h-[40px]`}>
-      <span className="shrink-0">{banniere.emoji}</span>
-      <span className="text-[12px] md:text-[13px] font-medium text-center leading-snug">
+    <div className={`sticky top-0 z-[60] ${bgClass} ${textClass} px-6 pr-12 ${taille.box} flex items-center justify-center gap-3`}>
+      <span className={`shrink-0 ${taille.emoji}`}>{banniere.emoji}</span>
+      <span className={`${taille.texte} text-center leading-snug`}>
         {banniere.texte}
       </span>
       <button
         onClick={() => setBanniere({ ...banniere, actif: false })}
         className="absolute right-4 top-1/2 -translate-y-1/2 opacity-60 hover:opacity-100 transition-opacity"
       >
-        <X size={14} />
+        <X size={16} />
       </button>
     </div>
   )
