@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { AnimateIn } from '@/components/layout/AnimateIn'
-import { useBanniere } from '@/components/layout/BanniereContext'
+import { useBanniere, BANNIERE_TAILLES, BANNIERE_TAILLE_DEFAUT, getBanniereTaille, type BanniereTaille } from '@/components/layout/BanniereContext'
 import { Plus, Tag, Pencil, Loader2, X } from 'lucide-react'
 import { getProductImage } from '@/lib/product-image-utils'
 
@@ -231,17 +231,38 @@ export default function Promotions() {
                 ))}
               </div>
             </div>
+            <div className="sm:col-span-2">
+              <label className="text-[11px] font-medium text-gris uppercase tracking-wider mb-1.5 block">
+                Taille
+              </label>
+              <div className="flex gap-2">
+                {(Object.keys(BANNIERE_TAILLES) as BanniereTaille[]).map((t) => {
+                  const selected = (banniere.taille ?? BANNIERE_TAILLE_DEFAUT) === t
+                  return (
+                    <button
+                      key={t}
+                      onClick={() => setBanniere({ ...banniere, taille: t })}
+                      className={`flex-1 py-1.5 rounded-lg text-[11px] font-medium border-2 transition-all ${
+                        selected ? 'border-vert bg-vert text-white' : 'border-creme-dark bg-white text-texte'
+                      }`}
+                    >
+                      {BANNIERE_TAILLES[t].label}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
           </div>
 
           <div className="mt-4 p-3 bg-creme/50 rounded-xl border border-creme-dark">
             <p className="text-[11px] font-medium text-gris uppercase tracking-wider mb-2">Aperçu</p>
-            <div className={`rounded-xl px-3 py-2 flex items-center justify-center gap-2 text-[12px] font-medium mb-3 ${
+            <div className={`rounded-xl px-3 ${getBanniereTaille(banniere.taille).box} flex items-center justify-center gap-2 mb-3 ${
               banniere.couleur === 'matcha' ? 'bg-matcha text-white' :
               banniere.couleur === 'or'     ? 'bg-or text-vert'      :
               'bg-vert text-white'
             }`}>
-              <span>{banniere.emoji}</span>
-              <span>{banniere.texte || 'Votre message ici...'}</span>
+              <span className={getBanniereTaille(banniere.taille).emoji}>{banniere.emoji}</span>
+              <span className={`${getBanniereTaille(banniere.taille).texte} text-center leading-snug`}>{banniere.texte || 'Votre message ici...'}</span>
             </div>
             <button
               onClick={async () => {
